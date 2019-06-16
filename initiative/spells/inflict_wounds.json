@@ -1,0 +1,38 @@
+{
+    "index": 170,
+    "name": "Inflict Wounds",
+    "desc": [
+        "Make a melee spell attack against a creature you can reach. On a hit, the target takes 3d10 necrotic damage."
+    ],
+    "higher_level": [
+        "When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d10 for each slot level above 1st."
+    ],
+    "page": "phb 253",
+    "range": "Touch",
+    "components": [
+        "V",
+        "S"
+    ],
+    "ritual": false,
+    "duration": "Instantaneous",
+    "concentration": false,
+    "casting_time": "1 action",
+    "level": 1,
+    "school": {
+        "name": "Necromancy",
+        "url": "http://www.dnd5eapi.co/api/magic-schools/7"
+    },
+    "classes": [
+        {
+            "name": "Cleric",
+            "url": "http://www.dnd5eapi.co/api/classes/3"
+        }
+    ],
+    "subclasses": [
+        {
+            "name": "Lore",
+            "url": "http://www.dnd5eapi.co/api/subclasses/2"
+        }
+    ],
+    "url": "http://www.dnd5eapi.co/api/spells/170"
+}

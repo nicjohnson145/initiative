@@ -1,0 +1,52 @@
+{
+    "index": 185,
+    "name": "Longstrider",
+    "desc": [
+        "You touch a creature. The target's speed increases by 10 feet until the spell ends."
+    ],
+    "higher_level": [
+        "When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each spell slot above 1st."
+    ],
+    "page": "phb 256",
+    "range": "Touch",
+    "components": [
+        "V",
+        "S",
+        "M"
+    ],
+    "material": "A pinch of dirt.",
+    "ritual": false,
+    "duration": "1 hour",
+    "concentration": false,
+    "casting_time": "1 action",
+    "level": 1,
+    "school": {
+        "name": "Transmutation",
+        "url": "http://www.dnd5eapi.co/api/magic-schools/8"
+    },
+    "classes": [
+        {
+            "name": "Bard",
+            "url": "http://www.dnd5eapi.co/api/classes/2"
+        },
+        {
+            "name": "Druid",
+            "url": "http://www.dnd5eapi.co/api/classes/4"
+        },
+        {
+            "name": "Ranger",
+            "url": "http://www.dnd5eapi.co/api/classes/8"
+        },
+        {
+            "name": "Wizard",
+            "url": "http://www.dnd5eapi.co/api/classes/12"
+        }
+    ],
+    "subclasses": [
+        {
+            "name": "Lore",
+            "url": "http://www.dnd5eapi.co/api/subclasses/2"
+        }
+    ],
+    "url": "http://www.dnd5eapi.co/api/spells/185"
+}

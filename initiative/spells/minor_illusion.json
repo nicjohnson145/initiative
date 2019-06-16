@@ -1,0 +1,51 @@
+{
+    "index": 205,
+    "name": "Minor Illusion",
+    "desc": [
+        "You create a sound or an image of an object within range that lasts for the duration. The illusion also ends if you dismiss it as an action or cast this spell again.",
+        "If you create a sound, its volume can range from a whisper to a scream. It can be your voice, someone else's voice, a lion's roar, a beating of drums, or any other sound you choose. The sound continues unabated throughout the duration, or you can make discrete sounds at different times before the spell ends.",
+        "If you create an image of an object--such as a chair, muddy footprints, or a small chest--it must be no larger than a 5-foot cube. The image can't create sound, light, smell, or any other sensory effect. Physical interaction with the image reveals it to be an illusion, because things can pass through it.",
+        "If a creature uses its action to examine the sound or image, the creature can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the illusion becomes faint to the creature."
+    ],
+    "page": "phb 260",
+    "range": "30 feet",
+    "components": [
+        "S",
+        "M"
+    ],
+    "material": "A bit of fleece.",
+    "ritual": false,
+    "duration": "1 minute",
+    "concentration": false,
+    "casting_time": "1 action",
+    "level": 0,
+    "school": {
+        "name": "Illusion",
+        "url": "http://www.dnd5eapi.co/api/magic-schools/6"
+    },
+    "classes": [
+        {
+            "name": "Bard",
+            "url": "http://www.dnd5eapi.co/api/classes/2"
+        },
+        {
+            "name": "Sorcerer",
+            "url": "http://www.dnd5eapi.co/api/classes/10"
+        },
+        {
+            "name": "Warlock",
+            "url": "http://www.dnd5eapi.co/api/classes/11"
+        },
+        {
+            "name": "Wizard",
+            "url": "http://www.dnd5eapi.co/api/classes/12"
+        }
+    ],
+    "subclasses": [
+        {
+            "name": "Lore",
+            "url": "http://www.dnd5eapi.co/api/subclasses/2"
+        }
+    ],
+    "url": "http://www.dnd5eapi.co/api/spells/205"
+}
