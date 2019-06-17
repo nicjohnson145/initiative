@@ -21,6 +21,7 @@ SKILLS = set([
     "stealth"
     "survival"
 ])
+NOTHING = 'n/a'
 
 
 class StatBlock(object):
@@ -80,49 +81,48 @@ class StatBlock(object):
     @cached_property
     def saving_throws(self):
         throws = [(key + ' +' + str(value)) for key, value in self._obj.items() if '_save' in key]
-        if len(throws) == 0:
-            return 'None'
-        return 'n/a' if len(throws) == 0 else ', '.join(throws)
+        return ', '.join(throws)
 
     @cached_property
     def skills(self):
-        return [(key, '+' + str(value)) for key, value in self._obj.items() if key in SKILLS]
+        skills = [(key + '+' + str(value)) for key, value in self._obj.items() if key in SKILLS]
+        return self.nothing_or_join(skills)
 
     @property
     def damage_vulnerabilities(self):
-        return self._obj['damage_vulnerabilities']
+        return ', '.join(self._obj['damage_vulnerabilities'])
 
     @property
     def damage_resistances(self):
-        return self._obj['damage_resistances']
+        return ', '.join(self._obj['damage_resistances'])
 
     @property
     def damage_immunities(self):
-        return self._obj['damage_immunities']
+        return ', '.join(self._obj['damage_immunities'])
 
     @property
     def condition_immunities(self):
-        return self._obj['condition_immunities']
+        return ', '.join(self._obj['condition_immunities'])
 
     @property
     def senses(self):
-        return self._obj['senses'].split(',')
+        return self._obj['senses']
 
     @property
     def languages(self):
-        return self._obj['languages'].split(',')
+        return self._obj['languages']
 
     @property
     def abilities(self):
-        return [(obj['name'], obj['desc']) for obj in self._obj.get('special_abilities', [])]
+        return [Ability(obj) for obj in self._obj.get('special_abilities', [])]
 
     @property
     def actions(self):
-        return [(obj['name'], obj['desc']) for obj in self._obj['actions']]
+        return [Action(obj) for obj in self._obj.get('actions', [])]
 
     @property
     def legendary_actions(self):
-        return [(obj['name'], obj['desc']) for obj in self._obj.get('legendary_actions', [])]
+        return [Ability(obj) for obj in self._obj.get('legendary_actions', [])]
 
     def get_modifier(self, value):
         mod = math.floor((value - 10) / 2)
@@ -134,3 +134,55 @@ class StatBlock(object):
         mod = self.get_modifier(score)
         return f"{score} ({mod})"
 
+
+class Action(object):
+
+    def __init__(self, obj):
+        self._obj = obj
+
+    @property
+    def name(self):
+        return self._obj['name']
+
+    @property
+    def description(self):
+        return self._obj['desc']
+
+    @property
+    def attack_bonus(self):
+        return '+' + str(self._obj['attack_bonus'])
+
+    @property
+    def damage(self):
+        if 'damage_dice' in self._obj:
+            dice = self._obj['damage_dice']
+            bonus = self._obj['damage_bonus']
+            return f"{dice} + {bonus}"
+        else:
+            return ''
+
+    def __str__(self):
+        return f"{self.name} [{self.attack_bonus}] ({self.damage})"
+
+    def as_popup(self):
+        return f"{self.name}\n\n{self.description}"
+
+
+class Ability(object):
+
+    def __init__(self, obj):
+        self._obj = obj
+
+    @property
+    def name(self):
+        return self._obj['name']
+
+    @property
+    def description(self):
+        return self._obj['desc']
+
+    def __str__(self):
+        return f"[{self.name}]"
+
+    def as_popup(self):
+        return f"{self.name}\n\n{self.description}"

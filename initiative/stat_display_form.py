@@ -1,4 +1,9 @@
 import npyscreen
+import curses
+
+from initiative.grid_box import GridBox
+
+BUTTON_COLUMNS = 4
 
 
 class StatDisplay(npyscreen.ActionFormMinimal):
@@ -7,20 +12,17 @@ class StatDisplay(npyscreen.ActionFormMinimal):
         self.add_handlers({
             'q': lambda *args: self.parentApp.switchFormPrevious(),
         })
-        self.armor_class = self.add(npyscreen.TitleFixedText, name='Armor Class')
-        self.hit_points = self.add(npyscreen.TitleFixedText, name='Hit Points')
-        self.speed = self.add(npyscreen.TitleFixedText, name='Speed')
-        self.stat_grid = self.add(npyscreen.GridColTitles, columns=6, values=[],
-                                  col_titles=['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'],
-                                  max_height=3)
-        self.saving_throws = self.add(npyscreen.TitleFixedText, name='Saving Throws')
 
     def populate_form(self):
+        self._clear_all_widgets()
+
         self.name = self.value.name
-        self.armor_class.value = self.value.armor_class
-        self.hit_points.value = self.value.hit_points
-        self.speed.value = self.value.speed
-        self.stat_grid.values = [[
+        self.add(npyscreen.TitleFixedText, name='Armor Class', value=self.value.armor_class)
+        self.add(npyscreen.TitleFixedText, name='Hit Points', value=self.value.hit_points)
+        self.add(npyscreen.TitleFixedText, name='Speed', value=self.value.speed)
+
+        self.nextrely += 1
+        stat_grid_values = [[
             self.value.strength,
             self.value.dexterity,
             self.value.constitution,
@@ -28,12 +30,67 @@ class StatDisplay(npyscreen.ActionFormMinimal):
             self.value.wisdom,
             self.value.charisma
         ]]
-        self.saving_throws.value = self.value.saving_throws
+        self.add(npyscreen.GridColTitles, columns=6, values=stat_grid_values, max_height=3,
+                 col_titles=['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'])
+        self.nextrely += 1
+
+        self.conditional_single_line_display('saving_throws', 'Saving Throws')
+        self.conditional_single_line_display('damage_vulnerabilities', 'Damage Vulnerabilities')
+        self.conditional_single_line_display('damage_resistances', 'Damage Resistances')
+        self.conditional_single_line_display('damage_immunities', 'Damage Immunities')
+        self.conditional_single_line_display('condition_immunities', 'Condition Immunities')
+        self.conditional_single_line_display('senses', 'Senses')
+        self.conditional_single_line_display('languages', 'Languages')
+
+        if len(self.value.abilities) > 0:
+            self.abilities_box = self.add(GridBox, name='Abilities', max_height=5)
+            self.abilities = self.abilities_box.entry_widget
+            self.abilities.columns = BUTTON_COLUMNS
+            self.abilities.max_height = 3
+            self.abilities.set_grid_values_from_flat_list(self.value.abilities)
+            self.abilities.add_handlers({
+                curses.ascii.NL: self.display_ability,
+            })
+
+        self.actions_box = self.add(GridBox, name='Actions', max_height=5)
+        self.actions = self.actions_box.entry_widget
+        self.actions.columns = BUTTON_COLUMNS
+        self.actions.max_height = 3
+        self.actions.set_grid_values_from_flat_list(self.value.actions)
+        self.actions.add_handlers({
+            curses.ascii.NL: self.display_action,
+        })
+
+        if len(self.value.abilities) > 0:
+            self.abilities.set_grid_values_from_flat_list(self.value.abilities)
+
+    def display_ability(self, *args):
+        row, column = self.abilities.edit_cell
+        msg = self.abilities.values[row][column].as_popup()
+        npyscreen.notify_confirm(msg)
+
+    def display_action(self, *args):
+        row, column = self.actions.edit_cell
+        msg = self.actions.values[row][column].as_popup()
+        npyscreen.notify_confirm(msg)
+
+
+    def conditional_single_line_display(self, attr, title):
+        longKwargs = {
+            'begin_entry_at': 23,
+            'use_two_lines': False
+        }
+        if len(getattr(self.value, attr)) > 0:
+            self.add(
+                npyscreen.TitleFixedText,
+                name=title,
+                value=getattr(self.value, attr),
+                **longKwargs
+            )
 
     def beforeEditing(self):
         self.populate_form()
 
     def on_ok(self):
         self.parentApp.switchFormPrevious()
-
 

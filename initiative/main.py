@@ -26,7 +26,7 @@ class MainMenu(npyscreen.FormBaseNew):
 
     def switch_to_individual(self):
         current_dir = os.path.dirname(__file__)
-        path = os.path.join(current_dir, 'monsters', 'commoner.json')
+        path = os.path.join(current_dir, 'monsters', 'aboleth.json')
         with open(path) as fl:
             data = json.load(fl)
         sb = StatBlock(data)
