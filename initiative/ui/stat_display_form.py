@@ -1,7 +1,7 @@
 import npyscreen
 import curses
 
-from initiative.grid_box import GridBox
+from initiative.ui.grid_box import GridBox
 
 BUTTON_COLUMNS = 4
 
@@ -65,15 +65,16 @@ class StatDisplay(npyscreen.ActionFormMinimal):
             self.abilities.set_grid_values_from_flat_list(self.value.abilities)
 
     def display_ability(self, *args):
-        row, column = self.abilities.edit_cell
-        msg = self.abilities.values[row][column].as_popup()
-        npyscreen.notify_confirm(msg)
+        self._display_popup('abilities')
 
     def display_action(self, *args):
-        row, column = self.actions.edit_cell
-        msg = self.actions.values[row][column].as_popup()
-        npyscreen.notify_confirm(msg)
+        self._display_popup('actions')
 
+    def _display_popup(self, attr):
+        widget = getattr(self, attr)
+        row, column = widget.edit_cell
+        msg = widget.values[row][column].as_popup()
+        npyscreen.notify_confirm(msg, wide=True)
 
     def conditional_single_line_display(self, attr, title):
         longKwargs = {

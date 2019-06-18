@@ -4,8 +4,8 @@ import os
 import npyscreen
 
 from initiative.constants import MAIN, STAT_DISPLAY
-from initiative.stat_block import StatBlock
-from initiative.stat_display_form import StatDisplay
+from initiative.models.stat_block import StatBlock
+from initiative.ui.stat_display_form import StatDisplay
 
 
 class MainMenu(npyscreen.FormBaseNew):
