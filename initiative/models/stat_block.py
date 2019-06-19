@@ -150,18 +150,18 @@ class Action(object):
 
     @property
     def attack_bonus(self):
-        return '+' + str(self._obj['attack_bonus'])
+        return '+' + str(self._obj['attack_bonus']) if 'attack_bonus' in self._obj else ''
 
     @property
     def damage(self):
-        if 'damage_dice' in self._obj:
-            dice = self._obj['damage_dice']
-            bonus = self._obj['damage_bonus']
-            return f"{dice} + {bonus}"
-        else:
-            return ''
+        dice = self._obj['damage_dice'] if 'damage_dice' in self._obj else ''
+        bonus = ' + ' + str(self._obj['damage_bonus']) if 'damage_bonus' in self._obj else ''
+        return f"{dice}{bonus}"
 
     def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
         return f"{self.name} [{self.attack_bonus}] ({self.damage})"
 
     def as_popup(self):
@@ -182,6 +182,9 @@ class Ability(object):
         return self._obj['desc']
 
     def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
         return f"[{self.name}]"
 
     def as_popup(self):
