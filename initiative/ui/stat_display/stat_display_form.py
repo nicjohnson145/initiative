@@ -1,7 +1,7 @@
 import npyscreen
 import curses
 
-from initiative.ui.grid_box import GridBox
+from initiative.ui.stat_display.grid_box import GridBox
 
 BUTTON_COLUMNS = 4
 

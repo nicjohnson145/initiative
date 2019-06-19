@@ -1,0 +1,2 @@
+class SpellBlock(object):
+    pass
