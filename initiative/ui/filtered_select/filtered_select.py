@@ -1,11 +1,12 @@
+import json
 import os
 import re
-import json
 
 import npyscreen
-from initiative.models.stat_block import StatBlock
+
+from initiative.constants import SPELL, STAT_DISPLAY, STATS
 from initiative.models.spell_block import SpellBlock
-from initiative.constants import STATS, SPELL, STAT_DISPLAY
+from initiative.models.stat_block import StatBlock
 
 
 class FileSearcher(object):

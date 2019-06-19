@@ -1,6 +1,6 @@
-import npyscreen
 import curses
-import logging
+
+import npyscreen
 
 from initiative.ui.stat_display.grid_box import GridBox
 

@@ -154,8 +154,8 @@ class Action(object):
 
     @property
     def damage(self):
-        dice = self._obj['damage_dice'] if 'damage_dice' in self._obj else ''
-        bonus = ' + ' + str(self._obj['damage_bonus']) if 'damage_bonus' in self._obj else ''
+        dice = self._obj.get('damage_dice', '')
+        bonus = self._boj.get('damage_bonus', '')
         return f"{dice}{bonus}"
 
     def __str__(self):
