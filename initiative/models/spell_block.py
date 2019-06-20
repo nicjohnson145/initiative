@@ -8,6 +8,10 @@ class SpellBlock(object):
         return self._obj['name']
 
     @property
+    def level(self):
+        return self._obj['level']
+
+    @property
     def casting_time(self):
         return self._obj['casting_time']
 
@@ -20,6 +24,10 @@ class SpellBlock(object):
         return ', '.join(self._obj['components'])
 
     @property
+    def concentration(self):
+        return str(self._obj['concentration'])
+
+    @property
     def duration(self):
         return self._obj['duration']
 
@@ -29,4 +37,5 @@ class SpellBlock(object):
 
     @property
     def higher_levels(self):
-        return self._obj.get('higher_levels' '')
+        return self._obj.get('higher_level', '')
+

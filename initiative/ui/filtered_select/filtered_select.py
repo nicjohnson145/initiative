@@ -4,7 +4,7 @@ import re
 
 import npyscreen
 
-from initiative.constants import SPELL, STAT_DISPLAY, STATS
+from initiative.constants import SPELL, SPELL_DISPLAY, STAT_DISPLAY, STATS
 from initiative.models.spell_block import SpellBlock
 from initiative.models.stat_block import StatBlock
 
@@ -62,6 +62,9 @@ class FileListDisplay(npyscreen.FormMuttActiveTraditional):
     def create(self):
         super().create()
         self.searcher = FileSearcher()
+        self.add_handlers({
+            'q': lambda *args: self.parentApp.switchFormPrevious(),
+        })
 
     def set_type(self, value):
         self._type = value
@@ -82,7 +85,8 @@ class FileListDisplay(npyscreen.FormMuttActiveTraditional):
 
     def get_form_name(self):
         forms = {
-            STATS: STAT_DISPLAY
+            STATS: STAT_DISPLAY,
+            SPELL: SPELL_DISPLAY,
         }
         return forms[self._type]
 
