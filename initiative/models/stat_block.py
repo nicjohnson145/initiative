@@ -155,7 +155,7 @@ class Action(object):
     @property
     def damage(self):
         dice = self._obj.get('damage_dice', '')
-        bonus = self._boj.get('damage_bonus', '')
+        bonus = self._obj.get('damage_bonus', '')
         return f"{dice}{bonus}"
 
     def __str__(self):
