@@ -33,9 +33,9 @@ class SpellBlock(object):
 
     @property
     def description(self):
-        return self._obj['desc']
+        return '\n'.join(self._obj['desc'])
 
     @property
     def higher_levels(self):
-        return self._obj.get('higher_level', '')
+        return '\n'.join(self._obj.get('higher_level', ''))
 

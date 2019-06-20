@@ -31,23 +31,30 @@ class SpellDisplay(npyscreen.ActionFormMinimal):
             val = getattr(self.value, attr)
             self.add(npyscreen.TitleFixedText, name=label, value=val)
 
-        self.add(
+        desc = self.add(
             PagerBox,
             name='Description',
             contained_widget_arguments={
-                'values': self.value.description,
-                'scroll_exit': True
+                'scroll_exit': True,
             },
-            max_height=6
+            max_height=8
         )
 
+        msg = self.wrap_message(self.value.description, desc)
+        desc.entry_widget.values = msg
+
         if len(self.value.higher_levels) > 0:
-            self.add(
+            levels = self.add(
                 PagerBox,
                 name='At Higher Levels',
                 contained_widget_arguments={
-                    'values': self.value.higher_levels,
-                    'scroll_exit': True
+                    'scroll_exit': True,
                 },
-                max_height=6
+                max_height=8
             )
+            msg = self.wrap_message(self.value.higher_levels, levels)
+            levels.entry_widget.values = msg
+
+    def wrap_message(self, message, widget):
+        width = widget.width - 5
+        return npyscreen.utilNotify._wrap_message_lines(message, width)
