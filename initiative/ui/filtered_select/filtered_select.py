@@ -27,7 +27,11 @@ class FileSearcher(object):
         self._regex = re.compile(value)
 
     def get_files(self):
-        return [path for path in os.listdir(self._directory) if self._regex.search(path)]
+        files = []
+        for path in os.listdir(self._directory):
+            if not os.path.basename(path).startswith('__'):
+                files.append(path)
+        return [path for path in files if self._regex.search(path)]
 
 
 class FileResults(npyscreen.MultiLineAction):
