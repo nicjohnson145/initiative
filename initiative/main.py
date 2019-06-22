@@ -7,6 +7,7 @@ from initiative.constants import FILTERED_SELECT, MAIN, SPELL, SPELL_DISPLAY, ST
 from initiative.ui.filtered_select.filtered_select import FileListDisplay
 from initiative.ui.spell_display.spell_display import SpellDisplay
 from initiative.ui.stat_display.stat_display_form import StatDisplay
+from initiative.models.config import Config
 
 
 class MainMenu(npyscreen.FormBaseNew):
@@ -16,7 +17,7 @@ class MainMenu(npyscreen.FormBaseNew):
         self.add(npyscreen.ButtonPress, name='Encounters',
                  when_pressed_function=lambda: print('Encounters'))
 
-        self.add(npyscreen.ButtonPress, name='Enemies',
+        self.add(npyscreen.ButtonPress, name='NPCS',
                  when_pressed_function=lambda: self.switch_to_selection_list(STATS))
 
         self.add(npyscreen.ButtonPress, name='Spells',
@@ -29,6 +30,8 @@ class MainMenu(npyscreen.FormBaseNew):
 
 class App(npyscreen.NPSAppManaged):
     def onStart(self):
+        self.config = Config()
+
         self.addForm(MAIN, MainMenu)
         self.addForm(STAT_DISPLAY, StatDisplay)
         self.addForm(SPELL_DISPLAY, SpellDisplay)
