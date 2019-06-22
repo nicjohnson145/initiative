@@ -5,6 +5,8 @@ import npyscreen
 from initiative.ui.stat_display.grid_box import GridBox
 
 BUTTON_COLUMNS = 4
+BOX_HEIGHT = 5
+ENTRY_HEIGHT = BOX_HEIGHT - 2
 
 
 class StatDisplay(npyscreen.ActionFormMinimal):
@@ -44,26 +46,22 @@ class StatDisplay(npyscreen.ActionFormMinimal):
         self.conditional_single_line_display('languages', 'Languages')
 
         if len(self.value.abilities) > 0:
-            self.abilities_box = self.add(GridBox, name='Abilities', max_height=5)
-            self.abilities = self.abilities_box.entry_widget
-            self.abilities.columns = BUTTON_COLUMNS
-            self.abilities.max_height = 3
-            self.abilities.set_grid_values_from_flat_list(self.value.abilities)
-            self.abilities.add_handlers({
-                curses.ascii.NL: self.display_ability,
-            })
+            self._create_grid_box('Abilities', 'abilities', self.display_ability)
 
-        self.actions_box = self.add(GridBox, name='Actions', max_height=5)
-        self.actions = self.actions_box.entry_widget
-        self.actions.columns = BUTTON_COLUMNS
-        self.actions.max_height = 3
-        self.actions.set_grid_values_from_flat_list(self.value.actions)
-        self.actions.add_handlers({
-            curses.ascii.NL: self.display_action,
+        self._create_grid_box('Actions', 'actions', self.display_action)
+
+        if len(self.value.legendary_actions) > 0:
+            self._create_grid_box('Legendary Actions', 'legendary_actions', self.display_ability)
+
+    def _create_grid_box(self, name, attribute, handler):
+        box = self.add(GridBox, name=name, max_height=BOX_HEIGHT)
+        entry = box.entry_widget
+        entry.columns = BUTTON_COLUMNS
+        entry.max_height = ENTRY_HEIGHT
+        entry.set_grid_values_from_flat_list(getattr(self.value, attribute))
+        entry.add_handlers({
+            curses.ascii.NL: handler
         })
-
-        if len(self.value.abilities) > 0:
-            self.abilities.set_grid_values_from_flat_list(self.value.abilities)
 
     def display_ability(self, *args):
         self._display_popup('abilities')
