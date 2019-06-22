@@ -46,28 +46,23 @@ class StatDisplay(npyscreen.ActionFormMinimal):
         self.conditional_single_line_display('languages', 'Languages')
 
         if len(self.value.abilities) > 0:
-            self._create_grid_box('Abilities', 'abilities', self.display_ability)
+            self._create_grid_box('Abilities', 'abilities')
 
-        self._create_grid_box('Actions', 'actions', self.display_action)
+        self._create_grid_box('Actions', 'actions')
 
         if len(self.value.legendary_actions) > 0:
-            self._create_grid_box('Legendary Actions', 'legendary_actions', self.display_ability)
+            self._create_grid_box('Legendary Actions', 'legendary_actions')
 
-    def _create_grid_box(self, name, attribute, handler):
+    def _create_grid_box(self, name, attribute):
         box = self.add(GridBox, name=name, max_height=BOX_HEIGHT)
+        setattr(self, attribute, box.entry_widget)
         entry = box.entry_widget
         entry.columns = BUTTON_COLUMNS
         entry.max_height = ENTRY_HEIGHT
         entry.set_grid_values_from_flat_list(getattr(self.value, attribute))
         entry.add_handlers({
-            curses.ascii.NL: handler
+            curses.ascii.NL: lambda *args: self._display_popup(attribute)
         })
-
-    def display_ability(self, *args):
-        self._display_popup('abilities')
-
-    def display_action(self, *args):
-        self._display_popup('actions')
 
     def _display_popup(self, attr):
         widget = getattr(self, attr)

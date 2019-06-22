@@ -36,9 +36,8 @@ class FileSearcher(object):
 
 class FileResults(npyscreen.MultiLineAction):
     def actionHighlighted(self, value, keypress):
-        root = self.parent.parentApp.root_dir
         directory = self.parent.get_directory()
-        path = os.path.join(root, directory, value)
+        path = os.path.join(directory, value)
         with open(path) as fl:
             data = json.load(fl)
         klass = self.parent.get_block()
