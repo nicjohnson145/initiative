@@ -31,14 +31,6 @@ class StatBlock(object):
         self._current_hp = self._obj['hit_points']
 
     @property
-    def current_hp(self):
-        return self._current_hp
-
-    @current_hp.setter
-    def current_hp(self, value):
-        self._current_hp = value
-
-    @property
     def name(self):
         return self._obj['name']
 
