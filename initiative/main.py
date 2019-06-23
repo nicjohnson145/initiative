@@ -3,11 +3,14 @@ import os
 import npyscreen
 from cached_property import cached_property
 
-from initiative.constants import FILTERED_SELECT, MAIN, SPELL, SPELL_DISPLAY, STAT_DISPLAY, STATS
+from initiative.constants import (
+    ENCOUNTER_LIST, FILTERED_SELECT, MAIN, SPELL, SPELL_DISPLAY, STAT_DISPLAY, STATS
+)
+from initiative.models.config import Config
+from initiative.ui.encounters.encounter_display import EncounterListDisplay
 from initiative.ui.filtered_select.filtered_select import FileListDisplay
 from initiative.ui.spell_display.spell_display import SpellDisplay
 from initiative.ui.stat_display.stat_display_form import StatDisplay
-from initiative.models.config import Config
 
 
 class MainMenu(npyscreen.FormBaseNew):
@@ -15,7 +18,7 @@ class MainMenu(npyscreen.FormBaseNew):
         self.add(npyscreen.TitleFixedText, editable=False, name='Main Menu')
 
         self.add(npyscreen.ButtonPress, name='Encounters',
-                 when_pressed_function=lambda: print('Encounters'))
+                 when_pressed_function=lambda: self.parentApp.switchForm(ENCOUNTER_LIST))
 
         self.add(npyscreen.ButtonPress, name='NPCS',
                  when_pressed_function=lambda: self.switch_to_selection_list(STATS))
@@ -36,6 +39,7 @@ class App(npyscreen.NPSAppManaged):
         self.addForm(STAT_DISPLAY, StatDisplay)
         self.addForm(SPELL_DISPLAY, SpellDisplay)
         self.addForm(FILTERED_SELECT, FileListDisplay)
+        self.addForm(ENCOUNTER_LIST, EncounterListDisplay)
 
     @cached_property
     def root_dir(self):
