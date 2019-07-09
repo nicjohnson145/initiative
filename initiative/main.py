@@ -1,3 +1,4 @@
+import logging
 import os
 
 import npyscreen
@@ -11,6 +12,11 @@ from initiative.ui.encounters.encounter_display import EncounterListDisplay
 from initiative.ui.filtered_select.filtered_select import FileListDisplay
 from initiative.ui.spell_display.spell_display import SpellDisplay
 from initiative.ui.stat_display.stat_display_form import StatDisplay
+
+logging.basicConfig(filename='app.log', filemode='w', level=logging.DEBUG,
+                    format='%(name)s - %(levelname)s - %(message)s')
+
+log = logging.getLogger(__name__)
 
 
 class MainMenu(npyscreen.FormBaseNew):

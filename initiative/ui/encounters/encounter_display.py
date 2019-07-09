@@ -1,3 +1,5 @@
+import curses
+import logging
 import os
 import pickle
 import re
@@ -5,6 +7,12 @@ import re
 import npyscreen
 
 NO_FILES = ['No encounters']
+
+log = logging.getLogger(__name__)
+
+E_KEY = ord('e')
+R_KEY = ord('r')
+NOOP_ARGS = [None, None, None]
 
 
 class EncounterSearcher(object):
@@ -35,7 +43,15 @@ class EncounterSearcher(object):
 
 class EncounterResults(npyscreen.MultiLineAction):
     def actionHighlighted(self, value, keypress):
-        pass
+        dispatch = {
+            E_KEY: self.parent.action_controller.edit_encounter,
+            R_KEY: self.parent.action_controller.reset_encounter,
+            curses.ascii.NL: self.parent.action_controller.edit_encounter,
+            curses.ascii.CR: self.parent.action_controller.edit_encounter,
+            curses.ascii.SP: self.parent.action_controller.edit_encounter,
+        }
+        func = dispatch.get(keypress, lambda *args: None)
+        func(*NOOP_ARGS)
 
 
 class EncounterListController(npyscreen.ActionControllerSimple):
@@ -51,13 +67,13 @@ class EncounterListController(npyscreen.ActionControllerSimple):
         self.parent.wMain.update(clear=True)
 
     def create_encounter(self, command_line, widget_proxy, live):
-        pass
+        log.info("create")
 
     def reset_encounter(self, command_line, widget_proxy, live):
-        pass
+        log.info("reset")
 
     def edit_encounter(self, command_line, widget_proxy, live):
-        pass
+        log.info('edit')
 
 
 class EncounterListDisplay(npyscreen.FormMuttActiveTraditional):
@@ -70,6 +86,8 @@ class EncounterListDisplay(npyscreen.FormMuttActiveTraditional):
         self.searcher = EncounterSearcher(self.parentApp.config.encounter_path)
         self.add_handlers({
             'q': lambda *args: self.parentApp.switchFormPrevious(),
+            E_KEY: self.wMain.h_act_on_highlighted,
+            R_KEY: self.wMain.h_act_on_highlighted,
         })
 
     def beforeEditing(self):
@@ -82,3 +100,6 @@ class EncounterListDisplay(npyscreen.FormMuttActiveTraditional):
         else:
             self.wMain.values = files
 
+    @property
+    def selected(self):
+        return self.wMain.values[self.wMain.cursor_line]

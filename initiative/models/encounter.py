@@ -28,7 +28,7 @@ class Encounter(object):
         self.names.remove(name)
 
     @property
-    def members(self):
+    def alive(self):
         return sorted((m for m in self.members if m.is_alive), key=lambda m: m.initiative)
 
     def __str__(self):
