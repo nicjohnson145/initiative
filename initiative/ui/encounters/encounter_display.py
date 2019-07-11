@@ -6,6 +6,9 @@ import re
 
 import npyscreen
 
+from initiative.constants import ENCOUNTER_EDIT
+from initiative.models.encounter import Encounter, Member
+
 NO_FILES = ['No encounters']
 
 log = logging.getLogger(__name__)
@@ -57,7 +60,7 @@ class EncounterResults(npyscreen.MultiLineAction):
 class EncounterListController(npyscreen.ActionControllerSimple):
     def create(self):
         self.add_action('^/.*', self.search, True)
-        self.add_action('^:add', self.create_encounter, False)
+        self.add_action('^:(add|create)', self.create_encounter, False)
         self.add_action('^:reset', self.reset_encounter, False)
         self.add_action('^:edit', self.edit_encounter, False)
 
@@ -67,13 +70,18 @@ class EncounterListController(npyscreen.ActionControllerSimple):
         self.parent.wMain.update(clear=True)
 
     def create_encounter(self, command_line, widget_proxy, live):
-        log.info("create")
+        self.parent.parentApp.getForm(ENCOUNTER_EDIT).value = None
+        self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
     def reset_encounter(self, command_line, widget_proxy, live):
         log.info("reset")
 
     def edit_encounter(self, command_line, widget_proxy, live):
-        log.info('edit')
+        enc = Encounter('Mistshore')
+        enc.add_member(Member.player('player1', 5))
+        enc.add_member(Member.player('player2', 6))
+        self.parent.parentApp.getForm(ENCOUNTER_EDIT).encounter = enc
+        self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
 
 class EncounterListDisplay(npyscreen.FormMuttActiveTraditional):

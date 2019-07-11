@@ -5,10 +5,12 @@ import npyscreen
 from cached_property import cached_property
 
 from initiative.constants import (
-    ENCOUNTER_LIST, FILTERED_SELECT, MAIN, SPELL, SPELL_DISPLAY, STAT_DISPLAY, STATS
+    ENCOUNTER_EDIT, ENCOUNTER_LIST, FILTERED_SELECT, MAIN, SPELL, SPELL_DISPLAY, STAT_DISPLAY,
+    STATS
 )
 from initiative.models.config import Config
 from initiative.ui.encounters.encounter_display import EncounterListDisplay
+from initiative.ui.encounters.encounter_edit import EncounterEdit
 from initiative.ui.filtered_select.filtered_select import FileListDisplay
 from initiative.ui.spell_display.spell_display import SpellDisplay
 from initiative.ui.stat_display.stat_display_form import StatDisplay
@@ -46,6 +48,7 @@ class App(npyscreen.NPSAppManaged):
         self.addForm(SPELL_DISPLAY, SpellDisplay)
         self.addForm(FILTERED_SELECT, FileListDisplay)
         self.addForm(ENCOUNTER_LIST, EncounterListDisplay)
+        self.addForm(ENCOUNTER_EDIT, EncounterEdit)
 
     @cached_property
     def root_dir(self):
