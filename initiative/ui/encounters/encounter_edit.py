@@ -1,8 +1,18 @@
+import logging
+
 import npyscreen
 
 from initiative.models.encounter import Encounter
 
 NO_MEMBERS = 'No Members'
+DISPLAYED_MEMBERS = 6
+BOX_HEIGHT = DISPLAYED_MEMBERS + 2
+
+log = logging.getLogger(__name__)
+
+
+class MultiLineBox(npyscreen.BoxTitle):
+    _contained_widget = npyscreen.MultiLineAction
 
 
 class EncounterEdit(npyscreen.ActionForm):
@@ -15,7 +25,7 @@ class EncounterEdit(npyscreen.ActionForm):
             npyscreen.TitleText, name='Encounter Name:', use_two_lines=False
         )
         self.members = self.add(
-            npyscreen.MultiLineAction, name='Members'
+            MultiLineBox, name='Members', max_height=BOX_HEIGHT
         )
 
     def beforeEditing(self):

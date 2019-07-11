@@ -80,6 +80,7 @@ class EncounterListController(npyscreen.ActionControllerSimple):
         enc = Encounter('Mistshore')
         enc.add_member(Member.player('player1', 5))
         enc.add_member(Member.player('player2', 6))
+        enc.add_member(Member.player('player3', 7))
         self.parent.parentApp.getForm(ENCOUNTER_EDIT).encounter = enc
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
