@@ -29,9 +29,10 @@ class Encounter(object):
 
     @property
     def all_members(self):
-        return self.members.values()
+        return list(self.members.values())
 
-    def __str__(self):
+    @property
+    def filename(self):
         pass
 
 
