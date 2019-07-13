@@ -61,6 +61,7 @@ class Member(object):
         self.hit_points = 0 if is_player else self.stat_block.hit_points
         self.initiative = self.roll_initiative() if initiative is None else int(initiative)
         self.is_alive = True
+        self._active = False
 
     @classmethod
     def player(cls, name, initiative):
@@ -85,3 +86,13 @@ class Member(object):
     def set_piece_name(self, name):
         self.piece_name = name
 
+    @property
+    def spell_slot_str(self):
+        return ' '.join([f'{level}[{uses}]' for level, uses in sorted(self.used_slots.items())])
+
+    def edit_display(self):
+        return self.name
+
+    def combat_display(self):
+        active = '+' if self._active else '-'
+        return f"{active}|{self.piece_name:.18}|{self.name}|{self.spell_slot_str}"

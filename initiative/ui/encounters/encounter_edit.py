@@ -11,8 +11,17 @@ BOX_HEIGHT = DISPLAYED_MEMBERS + 2
 log = logging.getLogger(__name__)
 
 
+class MemberEditMutliLineAction(npyscreen.MultiLineAction):
+
+    def display_value(self, member):
+        return member.edit_display()
+
+    def actionHighlighted(self, value, keypress):
+        pass
+
+
 class MultiLineBox(npyscreen.BoxTitle):
-    _contained_widget = npyscreen.MultiLineAction
+    _contained_widget = MemberEditMutliLineAction
 
 
 class EncounterEdit(npyscreen.ActionForm):
