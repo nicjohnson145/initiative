@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from initiative.util import rollD20
 
 
@@ -6,7 +6,7 @@ class Encounter(object):
 
     def __init__(self, name, active=False):
         self.name = name
-        self.members = []
+        self.members = OrderedDict()
         self.names = set()
         self.active = active
         self.instances = defaultdict(int)
@@ -16,29 +16,20 @@ class Encounter(object):
         return self.instances[name]
 
     def add_member(self, member):
-        assert(member.name not in self.names)
-        self.members.append(member)
-        self.names.add(member.name)
+        assert(member.name not in self.members)
+        self.members[member.name] = member
 
     def remove_member(self, name):
         assert(name in self.names)
-        index = None
-        for idx, member in enumerate(self.members):
-            if member.name == name:
-                index = idx
-                break
-
-        assert(index is not None)
-        del self.members[index]
-        self.names.remove(name)
+        del self.members[name]
 
     @property
     def alive(self):
-        return sorted((m for m in self.members if m.is_alive), key=lambda m: m.initiative)
+        return sorted((m for m in self.members.values() if m.is_alive), key=lambda m: m.initiative)
 
     @property
     def all_members(self):
-        return self.members
+        return self.members.values()
 
     def __str__(self):
         pass
