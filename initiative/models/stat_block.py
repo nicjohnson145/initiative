@@ -51,24 +51,48 @@ class StatBlock(object):
         return self.get_attribute_string('strength')
 
     @property
+    def raw_strength(self):
+        return self._obj['strength']
+
+    @property
     def dexterity(self):
         return self.get_attribute_string('dexterity')
+
+    @property
+    def raw_dexterity(self):
+        return self._obj['dexterity']
 
     @property
     def intelligence(self):
         return self.get_attribute_string('intelligence')
 
     @property
+    def raw_intelligence(self):
+        return self._obj['intelligence']
+
+    @property
     def wisdom(self):
         return self.get_attribute_string('wisdom')
+
+    @property
+    def raw_wisdom(self):
+        return self._obj['wisdom']
 
     @property
     def constitution(self):
         return self.get_attribute_string('constitution')
 
     @property
+    def raw_constitution(self):
+        return self._obj['constitution']
+
+    @property
     def charisma(self):
         return self.get_attribute_string('charisma')
+
+    @property
+    def raw_charisma(self):
+        return self._obj['charisma']
 
     @cached_property
     def saving_throws(self):
@@ -148,10 +172,11 @@ class Action(object):
     def damage(self):
         dice = self._obj.get('damage_dice', '')
         bonus = self._obj.get('damage_bonus', '')
+        bonus_str = f'+{bonus}' if bonus else ''
         if dice == '' and bonus == '':
             return ''
         else:
-            return f"({dice}{bonus})"
+            return f"({dice}{bonus_str})"
 
     def __str__(self):
         return self.__repr__()

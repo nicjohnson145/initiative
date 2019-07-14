@@ -9,3 +9,4 @@ ENCOUNTER_EDIT = 'encounter_edit'
 
 STATS = 'stats'
 SPELL = 'spell'
+ENCOUNTER_ADDITION = 'encounter_addition'

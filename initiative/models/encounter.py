@@ -1,5 +1,5 @@
 from collections import defaultdict, OrderedDict
-from initiative.util import rollD20
+from initiative.util import roll_d20, make_string_file_safe
 
 
 class Encounter(object):
@@ -13,7 +13,7 @@ class Encounter(object):
 
     def get_instance_for_name(self, name):
         self.instances[name] += 1
-        return self.instances[name]
+        return str(self.instances[name])
 
     def add_member(self, member):
         assert(member.name not in self.members)
@@ -33,7 +33,11 @@ class Encounter(object):
 
     @property
     def filename(self):
-        pass
+        return make_string_file_safe(self.name) + '.encounter'
+
+    @property
+    def valid(self):
+        return self.name is not None
 
 
 class Member(object):
@@ -67,7 +71,7 @@ class Member(object):
         self.used_slots[level] += 1
 
     def roll_initiative(self):
-        self.initiative = rollD20() + self.stat_block.dexterity
+        self.initiative = roll_d20() + self.stat_block.raw_dexterity
 
     def heal(self, amt):
         self.current_hp += amt

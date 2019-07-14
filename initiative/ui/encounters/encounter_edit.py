@@ -5,9 +5,11 @@ import npyscreen
 
 from initiative.custom_mutt import _CustomMutt
 from initiative.helpful_controller import HelpfulController
-from initiative.models.encounter import Encounter
+from initiative.models.encounter import Encounter, Member
+from initiative.constants import FILTERED_SELECT, ENCOUNTER_ADDITION
 
 NO_MEMBERS = ['No Members']
+NEW_ENCOUNTER = '<New Encounter>'
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +17,8 @@ log = logging.getLogger(__name__)
 class EncounterMembers(npyscreen.MultiLineAction):
 
     def display_value(self, member):
-        return member.edit_display() 
+        return member.edit_display() if isinstance(member, Member) else str(member)
+
     def actionHighlighted(self, value, keypress):
         pass
 
@@ -30,7 +33,14 @@ class EncounterEditController(HelpfulController):
         self.add_action(':q(uit)?', self.quit, False)
 
     def add_member(self, command_line, widget_proxy, live):
-        pass
+        if not self.parent.encounter.valid:
+            msg = "Must name encounter before adding members"
+            npyscreen.notify_confirm(msg, title='Invalid Encounter')
+        else:
+            form = self.parent.parentApp.getForm(FILTERED_SELECT)
+            form.set_type(ENCOUNTER_ADDITION)
+            form.encounter = self.parent.encounter
+            self.parent.parentApp.switchForm(FILTERED_SELECT)
 
     def remove_member(self, command_line, widget_proxy, live):
         pass
@@ -67,18 +77,18 @@ class EncounterEdit(_CustomMutt):
 
     def create(self):
         super().create()
-        self.encounter = None
+        self.encounter = Encounter(None)
         self.pending_edits = False
 
     def beforeEditing(self):
         self.wStatus2.value = 'Command'
-        if self.encounter is None:
-            self.as_new_encounter()
-        else:
+        if self.encounter.valid:
             self.from_encounter()
+        else:
+            self.as_new_encounter()
 
     def as_new_encounter(self):
-        self.wStatus1.value = '<New Encounter>'
+        self.wStatus1.value = NEW_ENCOUNTER
         self.wMain.values = NO_MEMBERS
 
     def from_encounter(self):
@@ -86,9 +96,10 @@ class EncounterEdit(_CustomMutt):
         self.wMain.values = self.encounter.all_members
 
     def set_encounter_name(self, name):
-        if self.encounter is None:
-            self.encounter = Encounter(name)
-        else:
-            self.encounter.name = name
+        self.encounter.name = name
         self.pending_edits = True
         self.set_status1_preserve_line(self.encounter.name)
+
+    def show_members(self):
+        self.wMain.values = self.encounter.all_members
+        self.wMain.update()

@@ -5,11 +5,12 @@ from textwrap import dedent
 
 import npyscreen
 
-from initiative.constants import SPELL, SPELL_DISPLAY, STAT_DISPLAY, STATS
+from initiative.constants import ENCOUNTER_ADDITION, SPELL, SPELL_DISPLAY, STAT_DISPLAY, STATS
 from initiative.custom_mutt import _CustomMutt
 from initiative.helpful_controller import HelpfulController
 from initiative.models.spell_block import SpellBlock
 from initiative.models.stat_block import StatBlock
+from initiative.models.encounter import Member
 
 
 class FileSearcher(object):
@@ -39,15 +40,32 @@ class FileSearcher(object):
 
 class FileResults(npyscreen.MultiLineAction):
     def actionHighlighted(self, value, keypress):
+        if self.parent.type_ in (STATS, SPELL):
+            self.display_block(value)
+        elif self.parent.type_ == ENCOUNTER_ADDITION:
+            self.add_to_encounter(value)
+
+    def display_block(self, value):
+        instance = self._load_value(value)
+        form_name = self.parent.get_form_name()
+        self.parent.parentApp.getForm(form_name).value = instance
+        self.parent.parentApp.switchForm(form_name)
+
+    def add_to_encounter(self, value):
+        encounter = self.parent.encounter
+        stat_block = self._load_value(value)
+        instance = encounter.get_instance_for_name(stat_block.name)
+        name = f"{stat_block.name}_{instance}"
+        encounter.add_member(Member.npc(name, stat_block))
+        self.parent.parentApp.switchFormPrevious()
+
+    def _load_value(self, value):
         directory = self.parent.get_directory()
         path = os.path.join(directory, value)
         with open(path) as fl:
             data = json.load(fl)
         klass = self.parent.get_block()
-        instance = klass(data)
-        form_name = self.parent.get_form_name()
-        self.parent.parentApp.getForm(form_name).value = instance
-        self.parent.parentApp.switchForm(form_name)
+        return klass(data)
 
 
 class FileListController(HelpfulController):
@@ -60,11 +78,12 @@ class FileListController(HelpfulController):
         self.parent.wMain.display()
 
     def help_message(self):
-        return dedent("""
+        base = dedent("""
             Press / and begin typing to search.
             Supports regular expressions
             Press <Enter> to return control to list navigation
         """)
+        return base
 
 
 class FileListDisplay(_CustomMutt):
@@ -74,13 +93,14 @@ class FileListDisplay(_CustomMutt):
 
     def create(self):
         super().create()
+        self.encounter = None
         self.searcher = FileSearcher()
         self.add_handlers({
             'q': lambda *args: self.parentApp.switchFormPrevious(),
         })
 
     def set_type(self, value):
-        self._type = value
+        self.type_ = value
 
     def beforeEditing(self):
         self.wStatus1.value = "Listing"
@@ -93,19 +113,22 @@ class FileListDisplay(_CustomMutt):
         blocks = {
             STATS: StatBlock,
             SPELL: SpellBlock,
+            ENCOUNTER_ADDITION: StatBlock,
         }
-        return blocks[self._type]
+        return blocks[self.type_]
 
     def get_form_name(self):
         forms = {
             STATS: STAT_DISPLAY,
             SPELL: SPELL_DISPLAY,
+            ENCOUNTER_ADDITION: None,
         }
-        return forms[self._type]
+        return forms[self.type_]
 
     def get_directory(self):
         directories = {
             STATS: os.path.join(self.parentApp.root_dir, 'monsters'),
             SPELL: os.path.join(self.parentApp.root_dir, 'spells'),
+            ENCOUNTER_ADDITION: os.path.join(self.parentApp.root_dir, 'monsters'),
         }
-        return directories[self._type]
+        return directories[self.type_]
