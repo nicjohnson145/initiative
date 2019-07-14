@@ -1,6 +1,7 @@
 import npyscreen
 
 from initiative.ui.spell_display.pager_box import PagerBox
+from initiative.util import wrap_message
 
 
 class SpellDisplay(npyscreen.ActionFormMinimal):
@@ -40,7 +41,7 @@ class SpellDisplay(npyscreen.ActionFormMinimal):
             max_height=8
         )
 
-        msg = self.wrap_message(self.value.description, desc)
+        msg = wrap_message(self.value.description, desc)
         desc.entry_widget.values = msg
 
         if len(self.value.higher_levels) > 0:
@@ -52,9 +53,6 @@ class SpellDisplay(npyscreen.ActionFormMinimal):
                 },
                 max_height=8
             )
-            msg = self.wrap_message(self.value.higher_levels, levels)
+            msg = wrap_message(self.value.higher_levels, levels)
             levels.entry_widget.values = msg
 
-    def wrap_message(self, message, widget):
-        width = widget.width - 5
-        return npyscreen.utilNotify._wrap_message_lines(message, width)

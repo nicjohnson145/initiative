@@ -1,10 +1,11 @@
 import logging
+from textwrap import dedent
 
 import npyscreen
-import curses
 
-from initiative.models.encounter import Encounter
 from initiative.custom_mutt import _CustomMutt
+from initiative.helpful_controller import HelpfulController
+from initiative.models.encounter import Encounter
 
 NO_MEMBERS = ['No Members']
 
@@ -14,13 +15,12 @@ log = logging.getLogger(__name__)
 class EncounterMembers(npyscreen.MultiLineAction):
 
     def display_value(self, member):
-        return member.edit_display()
-
+        return member.edit_display() 
     def actionHighlighted(self, value, keypress):
         pass
 
 
-class EncounterEditController(npyscreen.ActionControllerSimple):
+class EncounterEditController(HelpfulController):
 
     def create(self):
         self.add_action(':add', self.add_member, False)
@@ -48,6 +48,16 @@ class EncounterEditController(npyscreen.ActionControllerSimple):
             val = npyscreen.notify_yes_no(msg, title="Pending Edits")
             log.info(val)
         self.parent.parentApp.switchFormPrevious()
+
+    def _help_message(self):
+        return dedent("""
+            Actions:
+                - :add -> Add a Member to the encounter
+                - :remove <member_id> -> Remove a member from the encounter
+                - :name <name>-> Set the name of the encounter
+                - :save -> Save all edits made to this encounter to disk
+                - :q/:quit -> Leave this screen and return to the previous
+        """)
 
 
 class EncounterEdit(_CustomMutt):

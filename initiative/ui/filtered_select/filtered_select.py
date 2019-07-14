@@ -1,10 +1,12 @@
 import json
 import os
 import re
+from textwrap import dedent
 
 import npyscreen
 
 from initiative.constants import SPELL, SPELL_DISPLAY, STAT_DISPLAY, STATS
+from initiative.helpful_controller import HelpfulController
 from initiative.models.spell_block import SpellBlock
 from initiative.models.stat_block import StatBlock
 
@@ -47,7 +49,7 @@ class FileResults(npyscreen.MultiLineAction):
         self.parent.parentApp.switchForm(form_name)
 
 
-class FileListController(npyscreen.ActionControllerSimple):
+class FileListController(HelpfulController):
     def create(self):
         self.add_action('^/.*', self.search, True)
 
@@ -55,6 +57,13 @@ class FileListController(npyscreen.ActionControllerSimple):
         self.parent.searcher.set_regex(command_line[1:])
         self.parent.wMain.values = self.parent.searcher.get_files()
         self.parent.wMain.display()
+
+    def help_message(self):
+        return dedent("""
+            Press / and begin typing to search.
+            Supports regular expressions
+            Press <Enter> to return control to list navigation
+        """)
 
 
 class FileListDisplay(npyscreen.FormMuttActiveTraditional):

@@ -1,12 +1,12 @@
 import curses
 import logging
 import os
-import pickle
 import re
 
 import npyscreen
 
 from initiative.constants import ENCOUNTER_EDIT
+from initiative.helpful_controller import HelpfulController
 from initiative.models.encounter import Encounter, Member
 
 NO_FILES = ['No encounters']
@@ -57,7 +57,7 @@ class EncounterResults(npyscreen.MultiLineAction):
         func(*NOOP_ARGS)
 
 
-class EncounterListController(npyscreen.ActionControllerSimple):
+class EncounterListController(HelpfulController):
     def create(self):
         self.add_action('^/.*', self.search, True)
         self.add_action('^:(add|create)', self.create_encounter, False)
