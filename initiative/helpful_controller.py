@@ -13,7 +13,12 @@ class HelpfulController(npyscreen.ActionControllerSimple):
         npyscreen.notify_confirm(self.help_message(), title='Help', wide=True)
 
     def help_message(self):
-        return [str(a['identifier']) for a in self._action_list if a['identifier'] != ':.*']
+        ret = []
+        for action in self._action_list:
+            ident = str(action['identifier'])
+            if ident != "re.compile(':.*')":
+                ret.append(ident)
+        return ret
 
     def show_invalid(self, command_line, widget_proxy, live):
         self.parent.set_temp_status2_preserve_line('Invalid Command')

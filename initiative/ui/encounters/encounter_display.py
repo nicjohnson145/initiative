@@ -6,6 +6,7 @@ import re
 import npyscreen
 
 from initiative.constants import ENCOUNTER_EDIT
+from initiative.custom_mutt import _CustomMutt
 from initiative.helpful_controller import HelpfulController
 from initiative.models.encounter import Encounter, Member
 
@@ -85,7 +86,7 @@ class EncounterListController(HelpfulController):
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
 
-class EncounterListDisplay(npyscreen.FormMuttActiveTraditional):
+class EncounterListDisplay(_CustomMutt):
 
     ACTION_CONTROLLER = EncounterListController
     MAIN_WIDGET_CLASS = EncounterResults

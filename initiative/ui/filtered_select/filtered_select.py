@@ -6,6 +6,7 @@ from textwrap import dedent
 import npyscreen
 
 from initiative.constants import SPELL, SPELL_DISPLAY, STAT_DISPLAY, STATS
+from initiative.custom_mutt import _CustomMutt
 from initiative.helpful_controller import HelpfulController
 from initiative.models.spell_block import SpellBlock
 from initiative.models.stat_block import StatBlock
@@ -66,7 +67,7 @@ class FileListController(HelpfulController):
         """)
 
 
-class FileListDisplay(npyscreen.FormMuttActiveTraditional):
+class FileListDisplay(_CustomMutt):
 
     ACTION_CONTROLLER = FileListController
     MAIN_WIDGET_CLASS = FileResults
