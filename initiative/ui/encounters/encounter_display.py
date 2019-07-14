@@ -64,6 +64,7 @@ class EncounterListController(HelpfulController):
         self.add_action('^:(add|create)', self.create_encounter, False)
         self.add_action('^:reset', self.reset_encounter, False)
         self.add_action('^:edit', self.edit_encounter, False)
+        self.add_action('^:q(uit)?', self.quit, False)
 
     def search(self, command_line, widget_proxy, live):
         self.parent.searcher.set_regex(command_line[1:])
@@ -85,6 +86,9 @@ class EncounterListController(HelpfulController):
         self.parent.parentApp.getForm(ENCOUNTER_EDIT).encounter = enc
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
+    def quit(self, command_line, widget_proxy, live):
+        self.parent.parentApp.switchFormPrevious()
+
 
 class EncounterListDisplay(_CustomMutt):
 
@@ -95,7 +99,6 @@ class EncounterListDisplay(_CustomMutt):
         super().create()
         self.searcher = EncounterSearcher(self.parentApp.config.encounter_path)
         self.add_handlers({
-            'q': lambda *args: self.parentApp.switchFormPrevious(),
             E_KEY: self.wMain.h_act_on_highlighted,
             R_KEY: self.wMain.h_act_on_highlighted,
         })
