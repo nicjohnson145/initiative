@@ -4,6 +4,7 @@ import npyscreen
 import curses
 
 from initiative.models.encounter import Encounter
+from initiative.custom_mutt import _CustomMutt
 
 NO_MEMBERS = ['No Members']
 
@@ -49,7 +50,7 @@ class EncounterEditController(npyscreen.ActionControllerSimple):
         self.parent.parentApp.switchFormPrevious()
 
 
-class EncounterEdit(npyscreen.FormMuttActiveTraditional):
+class EncounterEdit(_CustomMutt):
 
     ACTION_CONTROLLER = EncounterEditController
     MAIN_WIDGET_CLASS = EncounterMembers
@@ -80,12 +81,4 @@ class EncounterEdit(npyscreen.FormMuttActiveTraditional):
         else:
             self.encounter.name = name
         self.pending_edits = True
-        self.set_status_preserve_line('wStatus1', self.encounter.name)
-
-    def set_status_preserve_line(self, attr, value):
-        status = getattr(self, attr)
-        status.value = value
-        status.update()
-        line_start = len(status.value) + 1
-        line_end = self.columns - line_start - 1
-        self.curses_pad.hline(status.rely, line_start, curses.ACS_HLINE, line_end)
+        self.set_status1_preserve_line(self.encounter.name)
