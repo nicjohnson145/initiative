@@ -1,12 +1,13 @@
+import curses
 import logging
 from textwrap import dedent
 
 import npyscreen
 
+from initiative.constants import ENCOUNTER_ADDITION, FILTERED_SELECT, STAT_DISPLAY
 from initiative.custom_mutt import _CustomMutt
 from initiative.helpful_controller import HelpfulController
 from initiative.models.encounter import Encounter, Member
-from initiative.constants import FILTERED_SELECT, ENCOUNTER_ADDITION
 
 NO_MEMBERS = ['No Members']
 NEW_ENCOUNTER = '<New Encounter>'
@@ -19,8 +20,14 @@ class EncounterMembers(npyscreen.MultiLineAction):
     def display_value(self, member):
         return member.edit_display() if isinstance(member, Member) else str(member)
 
-    def actionHighlighted(self, value, keypress):
-        pass
+    def actionHighlighted(self, member, keypress):
+        if keypress in (curses.ascii.NL, curses.ascii.CR):
+            if not member.is_player:
+                self.display_stat_block(member.stat_block)
+
+    def display_stat_block(self, stat_block):
+        self.parent.parentApp.getForm(STAT_DISPLAY).value = stat_block
+        self.parent.parentApp.switchForm(STAT_DISPLAY)
 
 
 class EncounterEditController(HelpfulController):
