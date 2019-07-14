@@ -4,6 +4,10 @@ from initiative.util import roll_d20, make_string_file_safe
 
 class Encounter(object):
 
+    @classmethod
+    def empty(cls):
+        return cls(None)
+
     def __init__(self, name, active=False):
         self.name = name
         self.members = OrderedDict()

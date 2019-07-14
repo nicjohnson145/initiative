@@ -71,7 +71,7 @@ class EncounterListController(HelpfulController):
         self.parent.wMain.update(clear=True)
 
     def create_encounter(self, command_line, widget_proxy, live):
-        self.parent.parentApp.getForm(ENCOUNTER_EDIT).value = None
+        self.parent.parentApp.getForm(ENCOUNTER_EDIT).encounter = Encounter.empty()
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
     def reset_encounter(self, command_line, widget_proxy, live):

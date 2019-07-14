@@ -84,7 +84,7 @@ class EncounterEdit(_CustomMutt):
 
     def create(self):
         super().create()
-        self.encounter = Encounter(None)
+        self.encounter = Encounter.empty()
         self.pending_edits = False
 
     def beforeEditing(self):
