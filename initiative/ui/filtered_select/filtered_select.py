@@ -2,6 +2,7 @@ import json
 import os
 import re
 from textwrap import dedent
+from cached_property import cached_property
 
 import npyscreen
 
@@ -13,29 +14,71 @@ from initiative.models.stat_block import StatBlock
 from initiative.models.encounter import Member
 
 
+class File(object):
+
+    def __init__(self, full_path, root):
+        self.full_path = full_path
+        self.root = root
+
+    @cached_property
+    def display_name(self):
+        return os.path.relpath(self.full_path, self.root)
+
+    @cached_property
+    def sort_name(self):
+        return os.path.basename(self.full_path)
+
+    def __str__(self):
+        return self.display_name
+
+
 class FileSearcher(object):
 
     DEFAULT_REGEX = re.compile(r'.*')
 
     def __init__(self):
-        self._directory = None
+        self._directories = None
+        self._files = []
         self.reset_regex()
 
     def reset_regex(self):
         self._regex = self.DEFAULT_REGEX
 
-    def set_directory(self, value):
-        self._directory = value
+    def set_directories(self, *directories):
+        self._directories = directories
+        self._files = self.walk_fs()
+
+    def refresh(self):
+        self._files = self.walk_fs()
+
+    def walk_fs(self):
+        objs = []
+        for directory in self._directories:
+            objs.extend(self._walk_directory(directory))
+        return objs
+
+    def _walk_directory(self, directory):
+        objs = []
+        for root, _, files in os.walk(directory):
+            for file in files:
+                if self.consideredFile(file):
+                    full_path = os.path.join(root, file)
+                    objs.append(File(full_path, directory))
+        return objs
+
+    def consideredFile(self, filename):
+        if filename.startswith('.'):
+            return False
+        elif filename.startswith('__'):
+            return False
+        return True
 
     def set_regex(self, value):
         self._regex = re.compile(value)
 
     def get_files(self):
-        files = []
-        for path in os.listdir(self._directory):
-            if not os.path.basename(path).startswith('__'):
-                files.append(path)
-        return [path for path in files if self._regex.search(path)]
+        files = [file for file in self._files if self._regex.search(file.display_name)]
+        return sorted(files, key=lambda x: x.sort_name)
 
 
 class FileResults(npyscreen.MultiLineAction):
@@ -60,9 +103,7 @@ class FileResults(npyscreen.MultiLineAction):
         self.parent.parentApp.switchFormPrevious()
 
     def _load_value(self, value):
-        directory = self.parent.get_directory()
-        path = os.path.join(directory, value)
-        with open(path) as fl:
+        with open(value.full_path) as fl:
             data = json.load(fl)
         klass = self.parent.get_block()
         return klass(data)
@@ -105,7 +146,7 @@ class FileListDisplay(_CustomMutt):
     def beforeEditing(self):
         self.wStatus1.value = "Listing"
         self.wStatus2.value = "Command"
-        self.searcher.set_directory(self.get_directory())
+        self.searcher.set_directories(*self.get_directories())
         self.searcher.reset_regex()
         self.wMain.values = self.searcher.get_files()
 
@@ -125,10 +166,18 @@ class FileListDisplay(_CustomMutt):
         }
         return forms[self.type_]
 
-    def get_directory(self):
+    def get_directories(self):
         directories = {
-            STATS: os.path.join(self.parentApp.root_dir, 'monsters'),
-            SPELL: os.path.join(self.parentApp.root_dir, 'spells'),
-            ENCOUNTER_ADDITION: os.path.join(self.parentApp.root_dir, 'monsters'),
+            STATS: [
+                os.path.join(self.parentApp.root_dir, 'monsters'),
+                self.parentApp.config.extra_npcs_path,
+            ],
+            SPELL: [
+                os.path.join(self.parentApp.root_dir, 'spells'),
+            ],
+            ENCOUNTER_ADDITION: [
+                os.path.join(self.parentApp.root_dir, 'monsters'),
+                self.parentApp.config.extra_npcs_path,
+            ],
         }
         return directories[self.type_]
