@@ -1,5 +1,10 @@
-from collections import defaultdict, OrderedDict
-from initiative.util import roll_d20, make_string_file_safe
+import logging
+import os
+from collections import OrderedDict, defaultdict
+
+from initiative.util import make_string_file_safe, roll_d20
+
+log = logging.getLogger(__name__)
 
 
 class Encounter(object):
@@ -8,12 +13,13 @@ class Encounter(object):
     def empty(cls):
         return cls(None)
 
-    def __init__(self, name, active=False):
+    def __init__(self, name, location=None, active=False):
         self.name = name
         self.members = OrderedDict()
         self.names = set()
         self.active = active
         self.instances = defaultdict(int)
+        self.location = location
 
     def get_instance_for_name(self, name):
         self.instances[name] += 1
@@ -42,6 +48,12 @@ class Encounter(object):
     @property
     def valid(self):
         return self.name is not None
+
+    @property
+    def path(self):
+        log.info(self.location)
+        log.info(self.filename)
+        return os.path.join(self.location, self.filename)
 
 
 class Member(object):

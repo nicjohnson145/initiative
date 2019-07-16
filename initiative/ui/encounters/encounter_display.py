@@ -1,6 +1,7 @@
 import curses
 import logging
 import os
+import pickle
 import re
 
 import npyscreen
@@ -8,7 +9,8 @@ import npyscreen
 from initiative.constants import ENCOUNTER_EDIT
 from initiative.custom_mutt import _CustomMutt
 from initiative.helpful_controller import HelpfulController
-from initiative.models.encounter import Encounter, Member
+from initiative.models.encounter import Encounter
+from initiative.mutli_directory_seacher import MultiDirectorySearcher
 
 NO_FILES = ['No encounters']
 
@@ -19,30 +21,10 @@ R_KEY = ord('r')
 NOOP_ARGS = [None, None, None]
 
 
-class EncounterSearcher(object):
+class EncounterSearcher(MultiDirectorySearcher):
 
-    DEFAULT_REGEX = re.compile(r'.*')
-
-    def __init__(self, directory):
-        self._directory = directory
-        self.reset_regex()
-
-    def reset_regex(self):
-        self._regex = self.DEFAULT_REGEX
-
-    def set_regex(self, value):
-        self._regex = re.compile(value)
-
-    def get_files(self):
-        found_files = []
-        for root, _, files in os.walk(self._directory):
-            rel_path = os.path.relpath(root, start=self._directory)
-            rel_path = '' if rel_path == '.' else rel_path
-            for file in files:
-                path = os.path.join(rel_path, file)
-                if file.endswith('.encounter') and self._regex.search(path):
-                    found_files.append(path)
-        return found_files
+    def considered_file(self, filename):
+        return filename.endswith('.encounter')
 
 
 class EncounterResults(npyscreen.MultiLineAction):
@@ -79,12 +61,13 @@ class EncounterListController(HelpfulController):
         log.info("reset")
 
     def edit_encounter(self, command_line, widget_proxy, live):
-        enc = Encounter('Mistshore')
-        enc.add_member(Member.player('player1', 5))
-        enc.add_member(Member.player('player2', 6))
-        enc.add_member(Member.player('player3', 7))
+        enc = self.load_encounter(self.parent.selected)
         self.parent.parentApp.getForm(ENCOUNTER_EDIT).encounter = enc
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
+
+    def load_encounter(self, file):
+        with open(file.full_path, 'rb') as fl:
+            return pickle.load(fl, fix_imports=False)
 
     def quit(self, command_line, widget_proxy, live):
         self.parent.parentApp.switchFormPrevious()
@@ -97,7 +80,8 @@ class EncounterListDisplay(_CustomMutt):
 
     def create(self):
         super().create()
-        self.searcher = EncounterSearcher(self.parentApp.config.encounter_path)
+        self.searcher = EncounterSearcher()
+        self.searcher.set_directories(self.parentApp.config.encounter_path)
         self.add_handlers({
             E_KEY: self.wMain.h_act_on_highlighted,
             R_KEY: self.wMain.h_act_on_highlighted,

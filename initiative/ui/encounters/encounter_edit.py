@@ -1,6 +1,7 @@
 import curses
 import logging
 from textwrap import dedent
+import pickle
 
 import npyscreen
 
@@ -36,18 +37,22 @@ class EncounterEditController(HelpfulController):
         self.add_action(':add', self.add_member, False)
         self.add_action(':remove', self.remove_member, False)
         self.add_action(':name', self.name_encounter, False)
-        self.add_action(':save', self.save_encounter, False)
+        self.add_action(':s(ave)?!?', self.save_encounter, False)
         self.add_action(':q(uit)?', self.quit, False)
 
     def add_member(self, command_line, widget_proxy, live):
-        if not self.parent.encounter.valid:
-            msg = "Must name encounter before adding members"
-            npyscreen.notify_confirm(msg, title='Invalid Encounter')
-        else:
+        if self.confirmed_valid():
             form = self.parent.parentApp.getForm(FILTERED_SELECT)
             form.set_type(ENCOUNTER_ADDITION)
             form.encounter = self.parent.encounter
             self.parent.parentApp.switchForm(FILTERED_SELECT)
+
+    def confirmed_valid(self):
+        if not self.parent.encounter.valid:
+            msg = "Must name encounter before adding members"
+            npyscreen.notify_confirm(msg, title='Invalid Encounter')
+            return False
+        return True
 
     def remove_member(self, command_line, widget_proxy, live):
         pass
@@ -57,7 +62,17 @@ class EncounterEditController(HelpfulController):
         self.parent.set_encounter_name(name)
 
     def save_encounter(self, command_line, widget_proxy, live):
+        if self.confirmed_valid():
+            if '!' in command_line or self.parent.encounter.location is None:
+                self.prompt_file_location()
+            self.save_file_location()
+
+    def prompt_file_location(self):
         pass
+
+    def save_file_location(self):
+        with open(self.parent.encounter.path, 'wb') as fl:
+            pickle.dump(self.parent.encounter, fl, fix_imports=False)
 
     def quit(self, command_line, widget_proxy, live):
         if self.parent.pending_edits:
