@@ -1,12 +1,10 @@
 import curses
 import logging
-import os
 import pickle
-import re
 
 import npyscreen
 
-from initiative.constants import ENCOUNTER_EDIT
+from initiative.constants import ENCOUNTER_EDIT, ENCOUNTER_EXT
 from initiative.custom_mutt import _CustomMutt
 from initiative.helpful_controller import HelpfulController
 from initiative.models.encounter import Encounter
@@ -24,7 +22,7 @@ NOOP_ARGS = [None, None, None]
 class EncounterSearcher(MultiDirectorySearcher):
 
     def considered_file(self, filename):
-        return filename.endswith('.encounter')
+        return filename.endswith(ENCOUNTER_EXT)
 
 
 class EncounterResults(npyscreen.MultiLineAction):
@@ -91,6 +89,7 @@ class EncounterListDisplay(_CustomMutt):
         self.wStatus1.value = "Encounters"
         self.wStatus2.value = "Command"
         self.searcher.reset_regex()
+        self.searcher.refresh()
         files = self.searcher.get_files()
         if len(files) == 0:
             self.wMain.values = NO_FILES

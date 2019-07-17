@@ -3,6 +3,7 @@ import os
 from collections import OrderedDict, defaultdict
 
 from initiative.util import make_string_file_safe, roll_d20
+from initiative.constants import ENCOUNTER_EXT
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class Encounter(object):
 
     @property
     def filename(self):
-        return make_string_file_safe(self.name) + '.encounter'
+        return make_string_file_safe(self.name) + ENCOUNTER_EXT
 
     @property
     def valid(self):

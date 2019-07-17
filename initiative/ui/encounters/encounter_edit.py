@@ -1,17 +1,18 @@
 import curses
 import logging
-from textwrap import dedent
+import os
 import pickle
+from textwrap import dedent
 
 import npyscreen
 
-from initiative.constants import ENCOUNTER_ADDITION, FILTERED_SELECT, STAT_DISPLAY
+from initiative.constants import ENCOUNTER_ADDITION, ENCOUNTER_EXT, FILTERED_SELECT, STAT_DISPLAY
 from initiative.custom_mutt import _CustomMutt
 from initiative.helpful_controller import HelpfulController
 from initiative.models.encounter import Encounter, Member
 
 NO_MEMBERS = ['No Members']
-NEW_ENCOUNTER = '<New Encounter>'
+NEW_ENCOUNTER = 'New-Encounter'
 
 log = logging.getLogger(__name__)
 
@@ -63,16 +64,42 @@ class EncounterEditController(HelpfulController):
 
     def save_encounter(self, command_line, widget_proxy, live):
         if self.confirmed_valid():
-            if '!' in command_line or self.parent.encounter.location is None:
+            encounter = self.parent.encounter
+            if '!' in command_line or encounter.location is None:
                 self.prompt_file_location()
             self.save_file_location()
 
     def prompt_file_location(self):
-        pass
+        location, name = self._show_file_dialog()
+        self.parent.encounter.name = name
+        self.parent.encounter.location = location
+        os.makedirs(location, exist_ok=True)
+
+    def _show_file_dialog(self):
+        form = npyscreen.PopupWide(name="Encounter Save", color='STANDOUT')
+        # Not sure what this does yet, modeling off the utilNotify code in npyscreen
+        form.preserve_selected_widget = True
+
+        locationwidget = form.add(npyscreen.TitleFilename, name="Location")
+        locationwidget.value = self._get_starting_location()
+
+        namewidget = form.add(npyscreen.TitleText, name='Name')
+        namewidget.value = self.parent.encounter.name
+
+        form.editw = 0
+        form.edit()
+        return locationwidget.value, namewidget.value
+
+    def _get_starting_location(self):
+        if self.parent.encounter.location is None:
+            return self.parent.parentApp.config.encounter_path
+        else:
+            return self.parent.encounter.location
 
     def save_file_location(self):
         with open(self.parent.encounter.path, 'wb') as fl:
             pickle.dump(self.parent.encounter, fl, fix_imports=False)
+        self.parent.pending_edits = False
 
     def quit(self, command_line, widget_proxy, live):
         if self.parent.pending_edits:
