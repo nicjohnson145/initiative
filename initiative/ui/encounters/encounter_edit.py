@@ -6,7 +6,7 @@ from textwrap import dedent
 
 import npyscreen
 
-from initiative.constants import ENCOUNTER_ADDITION, ENCOUNTER_EXT, FILTERED_SELECT, STAT_DISPLAY
+from initiative.constants import ENCOUNTER_ADDITION, FILTERED_SELECT, STAT_DISPLAY
 from initiative.custom_mutt import _CustomMutt
 from initiative.helpful_controller import HelpfulController
 from initiative.models.encounter import Encounter, Member
@@ -15,6 +15,40 @@ NO_MEMBERS = ['No Members']
 NEW_ENCOUNTER = 'New-Encounter'
 
 log = logging.getLogger(__name__)
+
+
+class RelativeFileComplete(npyscreen.Autocomplete):
+
+    def auto_complete(self, key_press):
+        # Incase there's a ~ in there
+        self.value = os.path.expanduser(self.value)
+        if not self.value.endswith('/'):
+            self.value += '/'
+        head, tail = os.path.split(self.value)
+        log.info("head: %s, tail: %s" % (head, tail))
+        dirs = []
+        for file in os.listdir(head):
+            isDir = os.path.isdir(os.path.join(head, file))
+            if isDir and tail in file:
+                dirs.append(file)
+
+        log.info('dirs: %s' % dirs)
+
+        if len(dirs) == 0:
+            log.info('no path')
+            return
+        elif len(dirs) == 1:
+            log.info('one path')
+            self.value = os.path.join(head, dirs[0]) + '/'
+        else:
+            log.info('many paths')
+            new_tail = dirs[self.get_choice(dirs)]
+            self.value = os.path.join(head, new_tail) + '/'
+        self.cursor_position = len(self.value)
+
+
+class TitleRelativeFileComplete(npyscreen.TitleText):
+    _entry_type = RelativeFileComplete
 
 
 class EncounterMembers(npyscreen.MultiLineAction):
@@ -80,7 +114,7 @@ class EncounterEditController(HelpfulController):
         # Not sure what this does yet, modeling off the utilNotify code in npyscreen
         form.preserve_selected_widget = True
 
-        locationwidget = form.add(npyscreen.TitleFilename, name="Location")
+        locationwidget = form.add(TitleRelativeFileComplete, name="Location")
         locationwidget.value = self._get_starting_location()
 
         namewidget = form.add(npyscreen.TitleText, name='Name')
