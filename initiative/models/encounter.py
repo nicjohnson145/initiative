@@ -16,8 +16,9 @@ class Encounter(object):
 
     def __init__(self, name, location=None, active=False):
         self.name = name
-        self.members = OrderedDict()
-        self.names = set()
+        self.members_by_name = {}
+        self.members_by_base_name = defaultdict(list)
+        self.members = []
         self.active = active
         self.instances = defaultdict(int)
         self.location = location
@@ -29,27 +30,52 @@ class Encounter(object):
             return name
         elif self.instances[name] == 1:
             # I've seen this name exactly once, need to rename the first to include a number
-            old = self.members.pop(name)
+            old = self.members_by_name.pop(name)
             old.name += '_1'
-            self.members[old.name] = old
+            self.members_by_name[old.name] = old
         self.instances[name] += 1
         return name + '_' + str(self.instances[name])
 
     def add_member(self, member):
-        assert(member.name not in self.members)
-        self.members[member.name] = member
+        self.members.append(member)
+        by_base = self.members_by_base_name[member.base_name]
+        by_base.append(member)
+        self.calculate_instance(by_base)
+        log.info(self.members_by_base_name)
 
-    def remove_member(self, name):
-        assert(name in self.names)
-        del self.members[name]
+    def calculate_instance(self, member_list):
+        if len(member_list) == 1:
+            member_list[0].name = member_list[0].base_name
+        else:
+            for index, member in enumerate(member_list):
+                member.name = member.base_name + '_' + str(index + 1)
+
+    def remove_member(self, member):
+        self._remove_member_from_list(self.members, member)
+        by_base = self.members_by_base_name[member.base_name]
+        self._remove_member_from_list(by_base, member)
+        if len(by_base) == 0:
+            del self.members_by_base_name[member.base_name]
+        else:
+            self.calculate_instance(by_base)
+
+    def _remove_member_from_list(self, member_list, member):
+        index = None
+        log.info('HEY!' + str(member_list))
+        for i, m in enumerate(member_list):
+            if m == member:
+                index = i
+                break
+        assert index is not None
+        del member_list[index]
 
     @property
     def alive(self):
-        return sorted((m for m in self.members.values() if m.is_alive), key=lambda m: m.initiative)
+        return sorted((m for m in self.members if m.is_alive), key=lambda m: m.initiative)
 
     @property
     def all_members(self):
-        return list(self.members.values())
+        return list(self.members)
 
     @property
     def filename(self):
@@ -68,13 +94,14 @@ class Encounter(object):
 
 class Member(object):
 
-    def __init__(self, name, stat_block=None, is_player=False, initiative=None):
+    def __init__(self, base_name, name=None, stat_block=None, is_player=False, initiative=None):
         if is_player:
             assert(initiative is not None)
         else:
             assert(stat_block is not None)
 
-        self.name = name
+        self.base_name = base_name
+        self.name = base_name if name is None else name
         self.piece_name = ''
         self.stat_block = stat_block
         self.is_player = is_player
@@ -86,12 +113,12 @@ class Member(object):
         self._active = False
 
     @classmethod
-    def player(cls, name, initiative):
-        return cls(name, is_player=True, initiative=initiative)
+    def player(cls, base_name, initiative):
+        return cls(base_name, is_player=True, initiative=initiative)
 
     @classmethod
-    def npc(cls, name, stat_block):
-        return cls(name, stat_block=stat_block)
+    def npc(cls, base_name, stat_block):
+        return cls(base_name, stat_block=stat_block)
 
     def use_spell(self, level):
         self.used_slots[level] += 1
@@ -117,4 +144,13 @@ class Member(object):
 
     def combat_display(self):
         active = '+' if self._active else '-'
-        return f"{active}|{self.piece_name:.18}|{self.name}|{self.spell_slot_str}"
+        if self.is_player:
+            return f"{active}|{self.name}"
+        else:
+            return f"{active}|{self.piece_name:.18}|{self.name}|{self.spell_slot_str}"
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __repr__(self):
+        return self.__class__.__name__ + f"(name='{self.name}')"
