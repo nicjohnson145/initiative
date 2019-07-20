@@ -39,8 +39,7 @@ class FileResults(npyscreen.MultiLineAction):
     def add_to_encounter(self, value):
         encounter = self.parent.encounter
         stat_block = self._load_value(value)
-        name = encounter.get_name(stat_block.name)
-        encounter.add_member(Member.npc(name, stat_block))
+        encounter.add_member(Member.npc(stat_block.name, stat_block))
         self.parent.parentApp.switchFormPrevious()
 
     def _load_value(self, value):

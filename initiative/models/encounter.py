@@ -1,6 +1,6 @@
 import logging
 import os
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 from initiative.util import make_string_file_safe, roll_d20
 from initiative.constants import ENCOUNTER_EXT
@@ -41,7 +41,6 @@ class Encounter(object):
         by_base = self.members_by_base_name[member.base_name]
         by_base.append(member)
         self.calculate_instance(by_base)
-        log.info(self.members_by_base_name)
 
     def calculate_instance(self, member_list):
         if len(member_list) == 1:
@@ -61,7 +60,6 @@ class Encounter(object):
 
     def _remove_member_from_list(self, member_list, member):
         index = None
-        log.info('HEY!' + str(member_list))
         for i, m in enumerate(member_list):
             if m == member:
                 index = i
@@ -87,8 +85,6 @@ class Encounter(object):
 
     @property
     def path(self):
-        log.info(self.location)
-        log.info(self.filename)
         return os.path.join(self.location, self.filename)
 
 

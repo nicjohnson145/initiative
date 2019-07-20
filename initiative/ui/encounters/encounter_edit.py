@@ -86,7 +86,8 @@ class EncounterEditController(HelpfulController):
         return True
 
     def remove_member(self, command_line, widget_proxy, live):
-        pass
+        self.parent.encounter.remove_member(self.parent.selected)
+        self.parent.show_members()
 
     def name_encounter(self, command_line, widget_proxy, live):
         name = command_line.replace(':name', '').strip()
@@ -183,3 +184,7 @@ class EncounterEdit(_CustomMutt):
     def show_members(self):
         self.wMain.values = self.encounter.all_members
         self.wMain.update()
+
+    @property
+    def selected(self):
+        return self.wMain.values[self.wMain.cursor_line]
