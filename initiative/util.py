@@ -15,7 +15,7 @@ def wrap_message(self, message, widget):
 
 def make_string_file_safe(s):
     def safe_char(c):
-        if c.isalnum():
+        if c.isalnum() or c in ('-', '_', '.'):
             return c
         elif c in string.whitespace:
             return '_'

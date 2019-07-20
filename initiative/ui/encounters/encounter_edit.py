@@ -19,32 +19,30 @@ log = logging.getLogger(__name__)
 
 class RelativeFileComplete(npyscreen.Autocomplete):
 
+    SHOW_HIDDEN_FILES = False
+
     def auto_complete(self, key_press):
         # Incase there's a ~ in there
         self.value = os.path.expanduser(self.value)
-        if not self.value.endswith('/'):
+        if os.path.exists(self.value) and not self.value.endswith('/'):
             self.value += '/'
+
         head, tail = os.path.split(self.value)
-        log.info("head: %s, tail: %s" % (head, tail))
-        dirs = []
-        for file in os.listdir(head):
-            isDir = os.path.isdir(os.path.join(head, file))
-            if isDir and tail in file:
-                dirs.append(file)
-
-        log.info('dirs: %s' % dirs)
-
+        dirs = [f for f in os.listdir(head) if self.filter_files(head, tail, f)]
         if len(dirs) == 0:
-            log.info('no path')
-            return
+            curses.beep()
         elif len(dirs) == 1:
-            log.info('one path')
             self.value = os.path.join(head, dirs[0]) + '/'
         else:
-            log.info('many paths')
             new_tail = dirs[self.get_choice(dirs)]
             self.value = os.path.join(head, new_tail) + '/'
         self.cursor_position = len(self.value)
+
+    def filter_files(self, head, tail, file):
+        if not self.SHOW_HIDDEN_FILES and file.startswith('.'):
+            return False
+        isDir = os.path.isdir(os.path.join(head, file))
+        return isDir and tail in file
 
 
 class TitleRelativeFileComplete(npyscreen.TitleText):
@@ -138,8 +136,9 @@ class EncounterEditController(HelpfulController):
     def quit(self, command_line, widget_proxy, live):
         if self.parent.pending_edits:
             msg = 'You have edits pending on this encounter, do you want to exit without saving?'
-            val = npyscreen.notify_yes_no(msg, title="Pending Edits")
-            log.info(val)
+            exit_anyway = npyscreen.notify_yes_no(msg, title="Pending Edits")
+            if not exit_anyway:
+                return
         self.parent.parentApp.switchFormPrevious()
 
     def _help_message(self):
