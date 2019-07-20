@@ -102,7 +102,7 @@ class StatBlock(object):
     @cached_property
     def skills(self):
         skills = [(key + '+' + str(value)) for key, value in self._obj.items() if key in SKILLS]
-        return self.nothing_or_join(skills)
+        return ', '.join(skills)
 
     @property
     def damage_vulnerabilities(self):

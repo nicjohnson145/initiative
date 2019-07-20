@@ -5,10 +5,10 @@ import pickle
 import npyscreen
 
 from initiative.constants import ENCOUNTER_EDIT, ENCOUNTER_EXT
-from initiative.custom_mutt import _CustomMutt
-from initiative.helpful_controller import HelpfulController
 from initiative.models.encounter import Encounter
-from initiative.mutli_directory_seacher import MultiDirectorySearcher
+from initiative.ui.custom_mutt import _CustomMutt
+from initiative.ui.helpful_controller import HelpfulController
+from initiative.ui.mutli_directory_seacher import MultiDirectorySearcher
 
 NO_FILES = ['No encounters']
 

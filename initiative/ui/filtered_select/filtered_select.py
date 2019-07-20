@@ -5,12 +5,12 @@ from textwrap import dedent
 import npyscreen
 
 from initiative.constants import ENCOUNTER_ADDITION, SPELL, SPELL_DISPLAY, STAT_DISPLAY, STATS
-from initiative.custom_mutt import _CustomMutt
-from initiative.helpful_controller import HelpfulController
 from initiative.models.encounter import Member
 from initiative.models.spell_block import SpellBlock
 from initiative.models.stat_block import StatBlock
-from initiative.mutli_directory_seacher import MultiDirectorySearcher
+from initiative.ui.custom_mutt import _CustomMutt
+from initiative.ui.helpful_controller import HelpfulController
+from initiative.ui.mutli_directory_seacher import MultiDirectorySearcher
 
 
 class JSONSearcher(MultiDirectorySearcher):

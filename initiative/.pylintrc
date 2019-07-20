@@ -1,0 +1,4 @@
+[MESSAGES CONTROL]
+disable = R,  # These three are for showing errors only
+          C,
+          W,

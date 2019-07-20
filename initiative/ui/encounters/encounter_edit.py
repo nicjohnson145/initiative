@@ -7,8 +7,8 @@ from textwrap import dedent
 import npyscreen
 
 from initiative.constants import ENCOUNTER_ADDITION, FILTERED_SELECT, STAT_DISPLAY
-from initiative.custom_mutt import _CustomMutt
-from initiative.helpful_controller import HelpfulController
+from initiative.ui.custom_mutt import _CustomMutt
+from initiative.ui.helpful_controller import HelpfulController
 from initiative.models.encounter import Encounter, Member
 
 NO_MEMBERS = ['No Members']
