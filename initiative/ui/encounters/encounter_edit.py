@@ -6,10 +6,11 @@ from textwrap import dedent
 
 import npyscreen
 
-from initiative.constants import ENCOUNTER_ADDITION, FILTERED_SELECT, STAT_DISPLAY
+from initiative.constants import STAT_DISPLAY
+from initiative.models.encounter import Encounter, Member
 from initiative.ui.custom_mutt import _CustomMutt
 from initiative.ui.helpful_controller import HelpfulController
-from initiative.models.encounter import Encounter, Member
+from initiative.util import add_to_encounter
 
 NO_MEMBERS = ['No Members']
 NEW_ENCOUNTER = 'New-Encounter'
@@ -73,12 +74,9 @@ class EncounterEditController(HelpfulController):
         self.add_action(':s(ave)?!?', self.save_encounter, False)
         self.add_action(':q(uit)?', self.quit, False)
 
-    def add_member(self, _command_line, _widget_proxy, _live):
+    def add_member(self, command_line, widget_proxy, live):
         if self.confirmed_valid():
-            form = self.parent.parentApp.getForm(FILTERED_SELECT)
-            form.set_type(ENCOUNTER_ADDITION)
-            form.encounter = self.parent.encounter
-            self.parent.parentApp.switchForm(FILTERED_SELECT)
+            add_to_encounter(self.parent.parentApp, self.parent.encounter)
 
     def confirmed_valid(self):
         if not self.parent.encounter.valid:
@@ -87,14 +85,14 @@ class EncounterEditController(HelpfulController):
             return False
         return True
 
-    def remove_member(self, _command_line, _widget_proxy, _live):
+    def remove_member(self, command_line, widget_proxy, live):
         pass
 
-    def name_encounter(self, command_line, _widget_proxy, _live):
+    def name_encounter(self, command_line, widget_proxy, live):
         name = command_line.replace(':name', '').strip()
         self.parent.set_encounter_name(name)
 
-    def save_encounter(self, command_line, _widget_proxy, _live):
+    def save_encounter(self, command_line, widget_proxy, live):
         if self.confirmed_valid():
             encounter = self.parent.encounter
             if '!' in command_line or encounter.location is None:
@@ -133,7 +131,7 @@ class EncounterEditController(HelpfulController):
             pickle.dump(self.parent.encounter, fl, fix_imports=False)
         self.parent.pending_edits = False
 
-    def quit(self, _command_line, _widget_proxy, _live):
+    def quit(self, command_line, widget_proxy, live):
         if self.parent.pending_edits:
             msg = 'You have edits pending on this encounter, do you want to exit without saving?'
             exit_anyway = npyscreen.notify_yes_no(msg, title="Pending Edits")
@@ -145,7 +143,7 @@ class EncounterEditController(HelpfulController):
         return dedent("""
             Actions:
                 - :add -> Add a Member to the encounter
-                - :remove <member_id> -> Remove a member from the encounter
+                 :remove <member_id> -> Remove a member from the encounter
                 - :name <name>-> Set the name of the encounter
                 - :save -> Save all edits made to this encounter to disk
                 - :q/:quit -> Leave this screen and return to the previous

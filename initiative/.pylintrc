@@ -3,3 +3,4 @@ disable = R,
           C,
           W0221,  # arguments differ from overriden function
           W0201,  # self variable assigned outside init
+          W0613,  # Unused argument, cant have it because of controller handlers

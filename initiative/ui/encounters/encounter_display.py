@@ -46,19 +46,19 @@ class EncounterListController(HelpfulController):
         self.add_action('^:edit', self.edit_encounter, False)
         self.add_action('^:q(uit)?', self.quit, False)
 
-    def search(self, command_line, _widget_proxy, _live):
+    def search(self, command_line, widget_proxy, live):
         self.parent.searcher.set_regex(command_line[1:])
         self.parent.wMain.values = self.parent.searcher.get_files()
         self.parent.wMain.update(clear=True)
 
-    def create_encounter(self, _command_line, _widget_proxy, _live):
+    def create_encounter(self, command_line, widget_proxy, live):
         self.parent.parentApp.getForm(ENCOUNTER_EDIT).encounter = Encounter.empty()
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
-    def reset_encounter(self, _command_line, _widget_proxy, _live):
+    def reset_encounter(self, command_line, widget_proxy, live):
         log.info("reset")
 
-    def edit_encounter(self, _command_line, _widget_proxy, _live):
+    def edit_encounter(self, command_line, widget_proxy, live):
         enc = self.load_encounter(self.parent.selected)
         self.parent.parentApp.getForm(ENCOUNTER_EDIT).encounter = enc
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
@@ -67,7 +67,7 @@ class EncounterListController(HelpfulController):
         with open(file.full_path, 'rb') as fl:
             return pickle.load(fl, fix_imports=False)
 
-    def quit(self, _command_line, _widget_proxy, _live):
+    def quit(self, command_line, widget_proxy, live):
         self.parent.parentApp.switchFormPrevious()
 
 

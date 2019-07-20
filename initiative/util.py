@@ -3,6 +3,8 @@ import string
 
 import npyscreen
 
+from initiative.constants import ENCOUNTER_ADDITION, FILTERED_SELECT
+
 
 def roll_d20():
     return random.randrange(1, 21)
@@ -23,3 +25,10 @@ def make_string_file_safe(s):
             return ''
 
     return ''.join(safe_char(c) for c in s)
+
+
+def add_to_encounter(parentApp, encounter):
+    form = parentApp.getForm(FILTERED_SELECT)
+    form.set_type(ENCOUNTER_ADDITION)
+    form.encounter = encounter
+    parentApp.switchForm(FILTERED_SELECT)
