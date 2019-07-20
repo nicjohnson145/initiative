@@ -26,7 +26,7 @@ NOTHING = 'n/a'
 
 class StatBlock(object):
 
-    def __init__(self, obj, path=None):
+    def __init__(self, obj):
         self._obj = obj
         self._current_hp = self._obj['hit_points']
 

@@ -1,4 +1,5 @@
 [MESSAGES CONTROL]
-disable = R,  # These three are for showing errors only
+disable = R,
           C,
-          W,
+          W0221,  # arguments differ from overriden function
+          W0201,  # self variable assigned outside init

@@ -24,7 +24,7 @@ class JSONSearcher(MultiDirectorySearcher):
 
 
 class FileResults(npyscreen.MultiLineAction):
-    def actionHighlighted(self, value, keypress):
+    def actionHighlighted(self, value, _keypress):
         if self.parent.type_ in (STATS, SPELL):
             self.display_block(value)
         elif self.parent.type_ == ENCOUNTER_ADDITION:
@@ -55,7 +55,7 @@ class FileListController(HelpfulController):
     def create(self):
         self.add_action('^/.*', self.search, True)
 
-    def search(self, command_line, widget_proxy, live):
+    def search(self, command_line, _widget_proxy, _live):
         self.parent.searcher.set_regex(command_line[1:])
         self.parent.wMain.values = self.parent.searcher.get_files()
         self.parent.wMain.display()

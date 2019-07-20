@@ -8,9 +8,9 @@ def roll_d20():
     return random.randrange(1, 21)
 
 
-def wrap_message(self, message, widget):
+def wrap_message(message, widget):
     width = widget.width - 5
-    return npyscreen.utilNotify._wrap_message_lines(message, width)
+    return npyscreen.utilNotify._wrap_message_lines(message, width)  # pylint: disable=W0212
 
 
 def make_string_file_safe(s):

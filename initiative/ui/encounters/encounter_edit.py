@@ -21,7 +21,7 @@ class RelativeFileComplete(npyscreen.Autocomplete):
 
     SHOW_HIDDEN_FILES = False
 
-    def auto_complete(self, key_press):
+    def auto_complete(self, _key_press):
         # Incase there's a ~ in there
         self.value = os.path.expanduser(self.value)
         if os.path.exists(self.value) and not self.value.endswith('/'):
@@ -73,7 +73,7 @@ class EncounterEditController(HelpfulController):
         self.add_action(':s(ave)?!?', self.save_encounter, False)
         self.add_action(':q(uit)?', self.quit, False)
 
-    def add_member(self, command_line, widget_proxy, live):
+    def add_member(self, _command_line, _widget_proxy, _live):
         if self.confirmed_valid():
             form = self.parent.parentApp.getForm(FILTERED_SELECT)
             form.set_type(ENCOUNTER_ADDITION)
@@ -87,14 +87,14 @@ class EncounterEditController(HelpfulController):
             return False
         return True
 
-    def remove_member(self, command_line, widget_proxy, live):
+    def remove_member(self, _command_line, _widget_proxy, _live):
         pass
 
-    def name_encounter(self, command_line, widget_proxy, live):
+    def name_encounter(self, command_line, _widget_proxy, _live):
         name = command_line.replace(':name', '').strip()
         self.parent.set_encounter_name(name)
 
-    def save_encounter(self, command_line, widget_proxy, live):
+    def save_encounter(self, command_line, _widget_proxy, _live):
         if self.confirmed_valid():
             encounter = self.parent.encounter
             if '!' in command_line or encounter.location is None:
@@ -133,7 +133,7 @@ class EncounterEditController(HelpfulController):
             pickle.dump(self.parent.encounter, fl, fix_imports=False)
         self.parent.pending_edits = False
 
-    def quit(self, command_line, widget_proxy, live):
+    def quit(self, _command_line, _widget_proxy, _live):
         if self.parent.pending_edits:
             msg = 'You have edits pending on this encounter, do you want to exit without saving?'
             exit_anyway = npyscreen.notify_yes_no(msg, title="Pending Edits")

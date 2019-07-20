@@ -8,7 +8,7 @@ class HelpfulController(npyscreen.ActionControllerSimple):
         self.add_action(':h(elp)?', self.display_help, False)
         self.add_action(':.*', self.show_invalid, False)
 
-    def display_help(self, command_line, widget_proxy, live):
+    def display_help(self, _command_line, _widget_proxy, _live):
         self.parent.set_status2_preserve_line(self.parent.COMMAND_TITLE)
         npyscreen.notify_confirm(self.help_message(), title='Help', wide=True)
 
@@ -20,7 +20,7 @@ class HelpfulController(npyscreen.ActionControllerSimple):
                 ret.append(ident)
         return ret
 
-    def show_invalid(self, command_line, widget_proxy, live):
+    def show_invalid(self, _command_line, _widget_proxy, _live):
         self.parent.set_temp_status2_preserve_line('Invalid Command')
 
     def process_command_live(self, command_line, control_widget_proxy):

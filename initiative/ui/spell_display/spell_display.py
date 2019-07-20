@@ -41,7 +41,7 @@ class SpellDisplay(npyscreen.ActionFormMinimal):
             max_height=8
         )
 
-        msg = wrap_message(self.value.description, desc)  # pylint: disable=E1120
+        msg = wrap_message(self.value.description, desc)
         desc.entry_widget.values = msg
 
         if len(self.value.higher_levels) > 0:
@@ -53,6 +53,6 @@ class SpellDisplay(npyscreen.ActionFormMinimal):
                 },
                 max_height=8
             )
-            msg = wrap_message(self.value.higher_levels, levels)  # pylint: disable=E1120
+            msg = wrap_message(self.value.higher_levels, levels)
             levels.entry_widget.values = msg
 
