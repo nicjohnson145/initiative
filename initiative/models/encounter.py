@@ -22,9 +22,18 @@ class Encounter(object):
         self.instances = defaultdict(int)
         self.location = location
 
-    def get_instance_for_name(self, name):
+    def get_name(self, name):
+        if self.instances[name] == 0:
+            # I haven't seen this name before, don't append a number
+            self.instances[name] += 1
+            return name
+        elif self.instances[name] == 1:
+            # I've seen this name exactly once, need to rename the first to include a number
+            old = self.members.pop(name)
+            old.name += '_1'
+            self.members[old.name] = old
         self.instances[name] += 1
-        return str(self.instances[name])
+        return name + '_' + str(self.instances[name])
 
     def add_member(self, member):
         assert(member.name not in self.members)
