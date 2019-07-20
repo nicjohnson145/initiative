@@ -20,7 +20,7 @@ class HelpfulController(npyscreen.ActionControllerSimple):
                 ret.append(ident)
         return ret
 
-    def show_invalid(self, _command_line, _widget_proxy, _live):
+    def show_invalid(self, command_line, widget_proxy, live):
         self.parent.set_temp_status2_preserve_line('Invalid Command')
 
     def process_command_live(self, command_line, control_widget_proxy):

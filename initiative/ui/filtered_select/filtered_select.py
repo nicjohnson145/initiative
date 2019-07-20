@@ -55,7 +55,7 @@ class FileListController(HelpfulController):
     def create(self):
         self.add_action('^/.*', self.search, True)
 
-    def search(self, command_line, _widget_proxy, _live):
+    def search(self, command_line, widget_proxy, live):
         self.parent.searcher.set_regex(command_line[1:])
         self.parent.wMain.values = self.parent.searcher.get_files()
         self.parent.wMain.display()
