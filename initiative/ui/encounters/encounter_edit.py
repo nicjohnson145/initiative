@@ -3,6 +3,7 @@ import logging
 import os
 import pickle
 from textwrap import dedent
+import re
 
 import npyscreen
 
@@ -67,9 +68,12 @@ class EncounterMembers(npyscreen.MultiLineAction):
 
 class EncounterEditController(HelpfulController):
 
+    duplicate_member_re = re.compile(r':dup(licate)? +(?P<copies>\d+)')
+
     def create(self):
         self.add_action(':add', self.add_member, False)
-        self.add_action(':remove', self.remove_member, False)
+        self.add_action(':r(emove)?', self.remove_member, False)
+        self.add_action(':dup(licate)?', self.duplicate_member, False)
         self.add_action(':name', self.name_encounter, False)
         self.add_action(':s(ave)?!?', self.save_encounter, False)
         self.add_action(':q(uit)?', self.quit, False)
@@ -88,6 +92,17 @@ class EncounterEditController(HelpfulController):
     def remove_member(self, command_line, widget_proxy, live):
         self.parent.encounter.remove_member(self.parent.selected)
         self.parent.show_members()
+
+    def duplicate_member(self, command_line, widget_proxy, live):
+        if self.parent.selected and not self.parent.selected.is_player:
+            match = self.duplicate_member_re.search(command_line)
+            if match:
+                copies = int(match.group('copies'))
+                old = self.parent.selected
+                for _ in range(copies):
+                    new = Member.npc(old.base_name, old.stat_block)
+                    self.parent.encounter.add_member(new)
+            self.parent.show_members()
 
     def name_encounter(self, command_line, widget_proxy, live):
         name = command_line.replace(':name', '').strip()

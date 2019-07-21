@@ -41,7 +41,7 @@ class EncounterResults(npyscreen.MultiLineAction):
 class EncounterListController(HelpfulController):
     def create(self):
         self.add_action('^/.*', self.search, True)
-        self.add_action('^:(add|create)', self.create_encounter, False)
+        self.add_action('^:(add|create|new)', self.create_encounter, False)
         self.add_action('^:reset', self.reset_encounter, False)
         self.add_action('^:edit', self.edit_encounter, False)
         self.add_action('^:start$', self.start_encounter, False)
