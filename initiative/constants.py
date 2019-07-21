@@ -5,6 +5,7 @@ SPELL_DISPLAY = 'spell_display'
 FILTERED_SELECT = 'filtered_select'
 ENCOUNTER_LIST = 'encounter_list'
 ENCOUNTER_EDIT = 'encounter_edit'
+COMBAT_DISPLAY = 'combat_display'
 
 
 STATS = 'stats'

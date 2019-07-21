@@ -4,7 +4,7 @@ import pickle
 
 import npyscreen
 
-from initiative.constants import ENCOUNTER_EDIT, ENCOUNTER_EXT
+from initiative.constants import COMBAT_DISPLAY, ENCOUNTER_EDIT, ENCOUNTER_EXT
 from initiative.models.encounter import Encounter
 from initiative.ui.custom_mutt import _CustomMutt
 from initiative.ui.helpful_controller import HelpfulController
@@ -30,9 +30,9 @@ class EncounterResults(npyscreen.MultiLineAction):
         dispatch = {
             E_KEY: self.parent.action_controller.edit_encounter,
             R_KEY: self.parent.action_controller.reset_encounter,
-            curses.ascii.NL: self.parent.action_controller.edit_encounter,
-            curses.ascii.CR: self.parent.action_controller.edit_encounter,
-            curses.ascii.SP: self.parent.action_controller.edit_encounter,
+            curses.ascii.NL: self.parent.action_controller.start_encounter,
+            curses.ascii.CR: self.parent.action_controller.start_encounter,
+            curses.ascii.SP: self.parent.action_controller.start_encounter,
         }
         func = dispatch.get(keypress, lambda *args: None)
         func(*NOOP_ARGS)
@@ -44,6 +44,7 @@ class EncounterListController(HelpfulController):
         self.add_action('^:(add|create)', self.create_encounter, False)
         self.add_action('^:reset', self.reset_encounter, False)
         self.add_action('^:edit', self.edit_encounter, False)
+        self.add_action('^:start$', self.start_encounter, False)
         self.add_action('^:q(uit)?', self.quit, False)
 
     def search(self, command_line, widget_proxy, live):
@@ -69,6 +70,11 @@ class EncounterListController(HelpfulController):
 
     def quit(self, command_line, widget_proxy, live):
         self.parent.parentApp.switchFormPrevious()
+
+    def start_encounter(self, command_line, widget_proxy, live):
+        encounter = self.load_encounter(self.parent.selected)
+        self.parent.parentApp.getForm(COMBAT_DISPLAY).encounter = encounter
+        self.parent.parentApp.switchForm(COMBAT_DISPLAY)
 
 
 class EncounterListDisplay(_CustomMutt):

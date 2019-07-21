@@ -47,7 +47,8 @@ class CombatController(HelpfulController):
         add_to_encounter(self.parent.parentApp, self.parent.encounter)
 
     def remove_member(self, command_line, widget_proxy, live):
-        pass
+        self.parent.encounter.remove_member(self.parent.selected)
+        self.parent.update()
 
     def add_players(self, command_line, widget_proxy, live):
         pass
@@ -67,6 +68,13 @@ class CombatDisplay(_CustomMutt):
     def create(self):
         super().create()
         self.encounter = None
+
+    def beforeEditing(self):
+        self.update()
+
+    def update(self):
+        self.wMain.values = self.encounter.alive
+        self.wMain.update()
 
     @property
     def selected(self):
