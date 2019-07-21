@@ -1,10 +1,12 @@
+import re
+
 import npyscreen
 
-from initiative.constants import STAT_DISPLAY
+from initiative.constants import ENCOUNTER_LIST, STAT_DISPLAY
+from initiative.models.encounter import Member
 from initiative.ui.custom_mutt import _CustomMutt
 from initiative.ui.helpful_controller import HelpfulController
 from initiative.util import add_to_encounter
-from initiative.models.encounter import Member
 
 
 class CombatLines(npyscreen.MultiLineAction):
@@ -20,6 +22,8 @@ class CombatLines(npyscreen.MultiLineAction):
 
 class CombatController(HelpfulController):
 
+    digit_re = re.compile(r':.* +(?P<amt>\d+)')
+
     def create(self):
         self.add_action(':d(amage)', self.damage_member, False)
         self.add_action(':h(eal)', self.heal_member, False)
@@ -27,15 +31,23 @@ class CombatController(HelpfulController):
         self.add_action(':deactivate$', self.deactivate_member, False)
         self.add_action(':add$', self.add_member, False)
         self.add_action(':remove$', self.remove_member, False)
-        self.add_action(':p(layers)?$', self.add_players, False)
-        self.add_action(':change$', self.change_attribute, False)
+        self.add_action(':p(layers)?', self.add_players, False)
+        self.add_action(':c(hange)?', self.change_attribute, False)
         self.add_action(':t(urn)?$', self.turn, False)
+        self.add_action(':q(uit)?$', self.quit, False)
 
     def damage_member(self, command_line, widget_proxy, live):
-        pass
+        self._health_interation('damage', command_line)
 
     def heal_member(self, command_line, widget_proxy, live):
-        pass
+        self._health_interation('heal', command_line)
+
+    def _health_interation(self, attr, cmd_line):
+        match = self.digit_re.search(cmd_line)
+        if match:
+            func = getattr(self.parent.selected, attr)
+            func(int(match.group('amt')))
+            self.parent.update()
 
     def activate_member(self, command_line, widget_proxy, live):
         pass
@@ -58,6 +70,9 @@ class CombatController(HelpfulController):
 
     def turn(self, command_line, widget_proxy, live):
         pass
+
+    def quit(self, command_line, widget_proxy, live):
+        self.parent.parentApp.switchForm(ENCOUNTER_LIST)
 
 
 class CombatDisplay(_CustomMutt):

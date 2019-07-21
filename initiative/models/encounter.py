@@ -7,6 +7,8 @@ from initiative.constants import ENCOUNTER_EXT
 
 log = logging.getLogger(__name__)
 
+PIECE_NAME_LEN = 18
+NAME_LEN = 15
 
 class Encounter(object):
 
@@ -72,6 +74,10 @@ class Encounter(object):
         return sorted((m for m in self.members if m.is_alive), key=lambda m: m.initiative)
 
     @property
+    def active(self):
+        return sorted((m for m in self.members if m.active), key=lambda m: m.initiative)
+
+    @property
     def all_members(self):
         return list(self.members)
 
@@ -98,7 +104,7 @@ class Member(object):
 
         self.base_name = base_name
         self.name = base_name if name is None else name
-        self.piece_name = ''
+        self.piece_name = ' ' * PIECE_NAME_LEN
         self.stat_block = stat_block
         self.is_player = is_player
         self.used_slots = defaultdict(int)
@@ -106,7 +112,7 @@ class Member(object):
         self.hit_points = 0 if is_player else self.stat_block.hit_points
         self.initiative = self.roll_initiative() if initiative is None else int(initiative)
         self.is_alive = True
-        self._active = False
+        self.active = False
 
     @classmethod
     def player(cls, base_name, initiative):
@@ -120,7 +126,7 @@ class Member(object):
         self.used_slots[level] += 1
 
     def roll_initiative(self):
-        self.initiative = roll_d20() + self.stat_block.raw_dexterity
+        return roll_d20() + self.stat_block.raw_dexterity
 
     def heal(self, amt):
         self.current_hp += amt
@@ -139,11 +145,17 @@ class Member(object):
         return self.name
 
     def combat_display(self):
-        active = '+' if self._active else '-'
+        active = '+' if self.active else '-'
         if self.is_player:
             return f"{active}|{self.name}"
         else:
-            return f"{active}|{self.piece_name:.18}|{self.name}|{self.spell_slot_str}"
+            return '|'.join([
+                f'{active}',
+                ('{:<%s}' % PIECE_NAME_LEN).format(self.piece_name),
+                ('{:<%s}' % NAME_LEN).format(self.name),
+                '{:<3} / {:<3}'.format(self.current_hp, self.hit_points),
+                f'{self.spell_slot_str}',
+            ])
 
     def __eq__(self, other):
         return self.name == other.name

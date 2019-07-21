@@ -10,7 +10,8 @@ from initiative.ui.custom_mutt import _CustomMutt
 from initiative.ui.helpful_controller import HelpfulController
 from initiative.ui.mutli_directory_seacher import MultiDirectorySearcher
 
-NO_FILES = ['No encounters']
+NO_ENCOUNTER = 'No encounters'
+NO_FILES = [NO_ENCOUNTER]
 
 log = logging.getLogger(__name__)
 
@@ -72,9 +73,10 @@ class EncounterListController(HelpfulController):
         self.parent.parentApp.switchFormPrevious()
 
     def start_encounter(self, command_line, widget_proxy, live):
-        encounter = self.load_encounter(self.parent.selected)
-        self.parent.parentApp.getForm(COMBAT_DISPLAY).encounter = encounter
-        self.parent.parentApp.switchForm(COMBAT_DISPLAY)
+        if self.parent.selected != NO_ENCOUNTER:
+            encounter = self.load_encounter(self.parent.selected)
+            self.parent.parentApp.getForm(COMBAT_DISPLAY).encounter = encounter
+            self.parent.parentApp.switchForm(COMBAT_DISPLAY)
 
 
 class EncounterListDisplay(_CustomMutt):
