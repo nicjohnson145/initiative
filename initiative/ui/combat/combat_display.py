@@ -21,8 +21,8 @@ class CombatLines(npyscreen.MultiLineAction):
 class CombatController(HelpfulController):
 
     def create(self):
-        self.add_action(':d(amage)?$', self.damage_member, False)
-        self.add_action(':h(eal)?$', self.heal_member, False)
+        self.add_action(':d(amage)', self.damage_member, False)
+        self.add_action(':h(eal)', self.heal_member, False)
         self.add_action(':activate$', self.activate_member, False)
         self.add_action(':deactivate$', self.deactivate_member, False)
         self.add_action(':add$', self.add_member, False)
