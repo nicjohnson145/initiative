@@ -21,7 +21,7 @@ class Encounter(object):
         self.members_by_name = {}
         self.members_by_base_name = defaultdict(list)
         self.members = []
-        self.active = active
+        self._active = active
         self.instances = defaultdict(int)
         self.location = location
 
