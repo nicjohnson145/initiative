@@ -10,6 +10,7 @@ log = logging.getLogger(__name__)
 PIECE_NAME_LEN = 18
 NAME_LEN = 15
 
+
 class Encounter(object):
 
     @classmethod
@@ -24,6 +25,7 @@ class Encounter(object):
         self._active = active
         self.instances = defaultdict(int)
         self.location = location
+        self.turn_index = 0
 
     def get_name(self, name):
         if self.instances[name] == 0:
@@ -43,6 +45,7 @@ class Encounter(object):
         by_base = self.members_by_base_name[member.base_name]
         by_base.append(member)
         self.calculate_instance(by_base)
+        self.maintain_order()
 
     def calculate_instance(self, member_list):
         if len(member_list) == 1:
@@ -59,6 +62,7 @@ class Encounter(object):
             del self.members_by_base_name[member.base_name]
         else:
             self.calculate_instance(by_base)
+        self.maintain_order()
 
     def _remove_member_from_list(self, member_list, member):
         index = None
@@ -69,17 +73,16 @@ class Encounter(object):
         assert index is not None
         del member_list[index]
 
-    @property
-    def alive(self):
-        return sorted((m for m in self.members if m.is_alive), key=lambda m: m.initiative)
+    def maintain_order(self):
+        self.members.sort(key=lambda m: m.initiative)
 
     @property
-    def active(self):
-        return sorted((m for m in self.members if m.active), key=lambda m: m.initiative)
+    def alive(self):
+        return list(filter(lambda m: m.is_alive, self.members))
 
     @property
     def all_members(self):
-        return list(self.members)
+        return self.members
 
     @property
     def filename(self):
@@ -92,6 +95,13 @@ class Encounter(object):
     @property
     def path(self):
         return os.path.join(self.location, self.filename)
+
+    @property
+    def current_turn_member(self):
+        return self.members[self.turn_index]
+
+    def advance_turn(self):
+        self.current_turn_member.current_turn = False
 
 
 class Member(object):
@@ -110,9 +120,9 @@ class Member(object):
         self.used_slots = defaultdict(int)
         self.current_hp = 0 if is_player else self.stat_block.hit_points
         self.hit_points = 0 if is_player else self.stat_block.hit_points
-        self.initiative = self.roll_initiative() if initiative is None else int(initiative)
+        self.set_initiative(initiative)
         self.is_alive = True
-        self.active = False
+        self.current_turn = False
 
     @classmethod
     def player(cls, base_name, initiative):
@@ -124,6 +134,9 @@ class Member(object):
 
     def use_spell(self, level):
         self.used_slots[level] += 1
+
+    def set_initiative(self, value=None):
+        self.initiative = self.roll_initiative() if value is None else int(value)
 
     def roll_initiative(self):
         return roll_d20() + self.stat_block.raw_dexterity
@@ -145,7 +158,7 @@ class Member(object):
         return self.name
 
     def combat_display(self):
-        active = '+' if self.active else '-'
+        active = '+' if self.current_turn else '-'
         if self.is_player:
             return f"{active}|{self.name}"
         else:
