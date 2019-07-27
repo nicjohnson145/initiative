@@ -1,6 +1,5 @@
 from testfixtures import compare
 from initiative.models.encounter import Member
-from collections import defaultdict
 from initiative.models.stat_block import StatBlock
 
 

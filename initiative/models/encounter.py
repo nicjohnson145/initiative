@@ -21,7 +21,7 @@ class Encounter(object):
     @classmethod
     def from_dict(cls, value):
         e = Encounter.empty()
-        e._from_dict(value)
+        e._from_dict(value)  # pylint: disable=W0212
         return e
 
     def __init__(self, name, location=None, active=False):
@@ -142,7 +142,7 @@ class Member(object):
     @classmethod
     def from_dict(cls, value):
         m = Member.empty()
-        m._from_dict(value)
+        m._from_dict(value)  # pylint: disable=W0212
         return m
 
     @classmethod
