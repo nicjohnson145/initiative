@@ -110,7 +110,7 @@ class Encounter(object):
 
     def _from_dict(self, value):
         self.name = value['name']
-        self.members_by_base_name = self.__members_by_base_name_from_dict(value['members_by_base_name'])
+        self.members_by_base_name = self.__members_by_base_name_from_dict(value['members_by_base_name'])  # noqa
         self.members = [Member.from_dict(d) for d in value['members']]
         self._active = value['active']
         self.location = value['location']
