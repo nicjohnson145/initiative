@@ -200,6 +200,3 @@ class EncounterEdit(_CustomMutt):
         self.wMain.values = self.encounter.all_members
         self.wMain.update()
 
-    @property
-    def selected(self):
-        return self.wMain.values[self.wMain.cursor_line]

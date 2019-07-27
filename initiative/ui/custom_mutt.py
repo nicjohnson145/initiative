@@ -58,3 +58,6 @@ class _CustomMutt(npyscreen.FormMuttActiveTraditional):
         self.reset_time = None
         self.displaying_invalid = False
 
+    @property
+    def selected(self):
+        return self.wMain.values[self.wMain.cursor_line]

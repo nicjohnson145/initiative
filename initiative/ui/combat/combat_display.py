@@ -90,7 +90,3 @@ class CombatDisplay(_CustomMutt):
     def update(self):
         self.wMain.values = self.encounter.alive
         self.wMain.update()
-
-    @property
-    def selected(self):
-        return self.wMain.values[self.wMain.cursor_line]

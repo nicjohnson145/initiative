@@ -104,6 +104,3 @@ class EncounterListDisplay(_CustomMutt):
         else:
             self.wMain.values = files
 
-    @property
-    def selected(self):
-        return self.wMain.values[self.wMain.cursor_line]
