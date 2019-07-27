@@ -2,8 +2,9 @@ import logging
 import os
 from collections import defaultdict
 
-from initiative.util import make_string_file_safe, roll_d20
 from initiative.constants import ENCOUNTER_EXT
+from initiative.models.stat_block import StatBlock
+from initiative.util import make_string_file_safe, roll_d20
 
 log = logging.getLogger(__name__)
 
@@ -17,28 +18,19 @@ class Encounter(object):
     def empty(cls):
         return cls(None)
 
+    @classmethod
+    def from_dict(cls, value):
+        e = Encounter.empty()
+        e._from_dict(value)
+        return e
+
     def __init__(self, name, location=None, active=False):
         self.name = name
-        self.members_by_name = {}
         self.members_by_base_name = defaultdict(list)
         self.members = []
         self._active = active
-        self.instances = defaultdict(int)
         self.location = location
         self.turn_index = 0
-
-    def get_name(self, name):
-        if self.instances[name] == 0:
-            # I haven't seen this name before, don't append a number
-            self.instances[name] += 1
-            return name
-        elif self.instances[name] == 1:
-            # I've seen this name exactly once, need to rename the first to include a number
-            old = self.members_by_name.pop(name)
-            old.name += '_1'
-            self.members_by_name[old.name] = old
-        self.instances[name] += 1
-        return name + '_' + str(self.instances[name])
 
     def add_member(self, member):
         self.members.append(member)
@@ -103,26 +95,55 @@ class Encounter(object):
     def advance_turn(self):
         self.current_turn_member.current_turn = False
 
+    def as_dict(self):
+        return {
+            'name': self.name,
+            'members_by_base_name': self.__members_by_base_name_to_dict(),
+            'members': [m.as_dict() for m in self.members],
+            'active': self._active,
+            'location': self.location,
+            'turn_index': self.turn_index,
+        }
+
+    def __members_by_base_name_to_dict(self):
+        return {name: [m.as_dict() for m in l] for name, l in self.members_by_base_name.items()}
+
+    def _from_dict(self, value):
+        self.name = value['name']
+        self.members_by_base_name = self.__members_by_base_name_from_dict(value['members_by_base_name'])
+        self.members = [Member.from_dict(d) for d in value['members']]
+        self._active = value['active']
+        self.location = value['location']
+        self.turn_index = value['turn_index']
+
+    def __members_by_base_name_from_dict(self, value):
+        return {name: [Member.from_dict(d) for d in l] for name, l in value.items()}
+
 
 class Member(object):
 
-    def __init__(self, base_name, name=None, stat_block=None, is_player=False, initiative=None):
-        if is_player:
-            assert(initiative is not None)
-        else:
-            assert(stat_block is not None)
-
+    def __init__(self, base_name=None, name=None, stat_block=None, is_player=False, initiative=None):  # noqa
         self.base_name = base_name
         self.name = base_name if name is None else name
         self.piece_name = ' ' * PIECE_NAME_LEN
         self.stat_block = stat_block
         self.is_player = is_player
         self.used_slots = defaultdict(int)
-        self.current_hp = 0 if is_player else self.stat_block.hit_points
-        self.hit_points = 0 if is_player else self.stat_block.hit_points
+        self.current_hp = 0 if stat_block is None else self.stat_block.hit_points
+        self.hit_points = 0 if stat_block is None else self.stat_block.hit_points
         self.set_initiative(initiative)
         self.is_alive = True
         self.current_turn = False
+
+    @classmethod
+    def empty(cls):
+        return cls(initiative=1)
+
+    @classmethod
+    def from_dict(cls, value):
+        m = Member.empty()
+        m._from_dict(value)
+        return m
 
     @classmethod
     def player(cls, base_name, initiative):
@@ -139,7 +160,7 @@ class Member(object):
         self.initiative = self.roll_initiative() if value is None else int(value)
 
     def roll_initiative(self):
-        return roll_d20() + self.stat_block.raw_dexterity
+        return roll_d20() + self.stat_block.dexterity_mod
 
     def heal(self, amt):
         self.current_hp += amt
@@ -175,3 +196,31 @@ class Member(object):
 
     def __repr__(self):
         return self.__class__.__name__ + f"(name='{self.name}')"
+
+    def as_dict(self):
+        return {
+            'base_name': self.base_name,
+            'name': self.name,
+            'piece_name': self.piece_name,
+            'stat_block': self.stat_block.as_dict(),
+            'is_player': self.is_player,
+            'used_slots': dict(self.used_slots),
+            'current_hp': self.current_hp,
+            'hit_points': self.hit_points,
+            'initiative': self.initiative,
+            'is_alive': self.is_alive,
+            'current_turn': self.current_turn,
+        }
+
+    def _from_dict(self, value):
+        self.base_name = value['base_name']
+        self.name = value['name']
+        self.piece_name = value['piece_name']
+        self.stat_block = StatBlock(value['stat_block'])
+        self.is_player = value['is_player']
+        self.used_slots = defaultdict(int, value['used_slots'])
+        self.current_hp = value['current_hp']
+        self.hit_points = value['hit_points']
+        self.initiative = value['initiative']
+        self.is_alive = value['is_alive']
+        self.current_turn = value['current_turn']

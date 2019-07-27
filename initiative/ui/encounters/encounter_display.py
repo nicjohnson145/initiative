@@ -1,6 +1,6 @@
 import curses
+import json
 import logging
-import pickle
 
 import npyscreen
 
@@ -66,8 +66,10 @@ class EncounterListController(HelpfulController):
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
     def load_encounter(self, file):
-        with open(file.full_path, 'rb') as fl:
-            return pickle.load(fl, fix_imports=False)
+        with open(file.full_path, 'r') as fl:
+            e = Encounter.from_dict(json.load(fl))
+            log.info(e)
+            return e
 
     def quit(self, command_line, widget_proxy, live):
         self.parent.parentApp.switchFormPrevious()

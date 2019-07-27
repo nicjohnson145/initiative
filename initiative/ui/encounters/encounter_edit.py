@@ -1,9 +1,9 @@
 import curses
+import json
 import logging
 import os
-import pickle
-from textwrap import dedent
 import re
+from textwrap import dedent
 
 import npyscreen
 
@@ -143,8 +143,8 @@ class EncounterEditController(HelpfulController):
             return self.parent.encounter.location
 
     def save_file_location(self):
-        with open(self.parent.encounter.path, 'wb') as fl:
-            pickle.dump(self.parent.encounter, fl, fix_imports=False)
+        with open(self.parent.encounter.path, 'w') as fl:
+            json.dump(self.parent.encounter.as_dict(), fl, indent=4)
         self.parent.pending_edits = False
 
     def quit(self, command_line, widget_proxy, live):
@@ -159,7 +159,7 @@ class EncounterEditController(HelpfulController):
         return dedent("""
             Actions:
                 - :add -> Add a Member to the encounter
-                 :remove <member_id> -> Remove a member from the encounter
+                - :remove <member_id> -> Remove a member from the encounter
                 - :name <name>-> Set the name of the encounter
                 - :save -> Save all edits made to this encounter to disk
                 - :q/:quit -> Leave this screen and return to the previous

@@ -27,8 +27,7 @@ NOTHING = 'n/a'
 class StatBlock(object):
 
     def __init__(self, obj):
-        self._obj = obj
-        self._current_hp = self._obj['hit_points']
+        self.from_dict(obj)
 
     @property
     def name(self):
@@ -55,12 +54,20 @@ class StatBlock(object):
         return self._obj['strength']
 
     @property
+    def strength_mod(self):
+        return self.get_modifier(self.raw_strength)
+
+    @property
     def dexterity(self):
         return self.get_attribute_string('dexterity')
 
     @property
     def raw_dexterity(self):
         return self._obj['dexterity']
+
+    @property
+    def dexterity_mod(self):
+        return self.get_modifier(self.raw_dexterity)
 
     @property
     def intelligence(self):
@@ -71,12 +78,20 @@ class StatBlock(object):
         return self._obj['intelligence']
 
     @property
+    def intelligence_mod(self):
+        return self.get_modifier(self.raw_intelligence)
+
+    @property
     def wisdom(self):
         return self.get_attribute_string('wisdom')
 
     @property
     def raw_wisdom(self):
         return self._obj['wisdom']
+
+    @property
+    def wisdom_mod(self):
+        return self.get_modifier(self.raw_wisdom)
 
     @property
     def constitution(self):
@@ -87,12 +102,20 @@ class StatBlock(object):
         return self._obj['constitution']
 
     @property
+    def constitution_mod(self):
+        return self.get_modifier(self.raw_constitution)
+
+    @property
     def charisma(self):
         return self.get_attribute_string('charisma')
 
     @property
     def raw_charisma(self):
         return self._obj['charisma']
+
+    @property
+    def charisma_mod(self):
+        return self.get_modifier(self.raw_charisma)
 
     @cached_property
     def saving_throws(self):
@@ -141,14 +164,19 @@ class StatBlock(object):
         return [Ability(obj) for obj in self._obj.get('legendary_actions', [])]
 
     def get_modifier(self, value):
-        mod = math.floor((value - 10) / 2)
-        sign = '+' if mod >= 0 else ''
-        return sign + str(mod)
+        return math.floor((value - 10) / 2)
 
     def get_attribute_string(self, attr):
         score = self._obj[attr]
         mod = self.get_modifier(score)
-        return f"{score} ({mod})"
+        sign = '+' if mod >= 0 else ''
+        return f"{score} ({sign}{mod})"
+
+    def as_dict(self):
+        return self._obj
+
+    def from_dict(self, value):
+        self._obj = value
 
 
 class Action(object):
