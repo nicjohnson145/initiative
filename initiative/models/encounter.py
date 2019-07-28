@@ -1,6 +1,7 @@
 import logging
 import os
 from collections import defaultdict
+import json
 
 from initiative.constants import ENCOUNTER_EXT
 from initiative.models.stat_block import StatBlock
@@ -92,8 +93,23 @@ class Encounter(object):
     def current_turn_member(self):
         return self.members[self.turn_index]
 
+    def indicate_turn(self):
+        self.current_turn_member.current_turn = True
+
     def advance_turn(self):
+        if len(self.alive) <= 1:
+            return
+
         self.current_turn_member.current_turn = False
+        self.__next_index()
+        while not self.current_turn_member.is_alive:
+            self.__next_index()
+        self.indicate_turn()
+
+    def __next_index(self):
+        self.turn_index += 1
+        if self.turn_index == len(self.members):
+            self.turn_index = 0
 
     def as_dict(self):
         return {
@@ -117,7 +133,18 @@ class Encounter(object):
         self.turn_index = value['turn_index']
 
     def __members_by_base_name_from_dict(self, value):
-        return {name: [Member.from_dict(d) for d in l] for name, l in value.items()}
+        d = {name: [Member.from_dict(d) for d in l] for name, l in value.items()}
+        return defaultdict(list, d)
+
+    def save(self):
+        with open(self.path, 'w') as fl:
+            json.dump(self.as_dict(), fl, indent=4)
+
+    @classmethod
+    def load(self, filepath):
+        with open(filepath, 'r') as fl:
+            e = Encounter.from_dict(json.load(fl))
+            return e
 
 
 class Member(object):

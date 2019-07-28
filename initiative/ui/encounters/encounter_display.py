@@ -66,10 +66,7 @@ class EncounterListController(HelpfulController):
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
     def load_encounter(self, file):
-        with open(file.full_path, 'r') as fl:
-            e = Encounter.from_dict(json.load(fl))
-            log.info(e)
-            return e
+        return Encounter.load(file.full_path)
 
     def quit(self, command_line, widget_proxy, live):
         self.parent.parentApp.switchFormPrevious()

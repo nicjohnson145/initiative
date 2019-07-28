@@ -143,8 +143,7 @@ class EncounterEditController(HelpfulController):
             return self.parent.encounter.location
 
     def save_file_location(self):
-        with open(self.parent.encounter.path, 'w') as fl:
-            json.dump(self.parent.encounter.as_dict(), fl, indent=4)
+        self.parent.encounter.save()
         self.parent.pending_edits = False
 
     def quit(self, command_line, widget_proxy, live):
