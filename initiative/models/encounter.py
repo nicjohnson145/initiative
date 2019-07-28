@@ -67,7 +67,7 @@ class Encounter(object):
         del member_list[index]
 
     def maintain_order(self):
-        self.members.sort(key=lambda m: m.initiative)
+        self.members.sort(key=lambda m: m.initiative, reverse=True)
 
     @property
     def alive(self):

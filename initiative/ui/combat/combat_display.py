@@ -23,6 +23,7 @@ class CombatLines(npyscreen.MultiLineAction):
 class CombatController(HelpfulController):
 
     digit_re = re.compile(r':.* +(?P<amt>\d+)')
+    players_re = re.compile(r':p(layers)? +(?P<player_string>.*)')
 
     def create(self):
         self.add_action(':d(amage)', self.damage_member, False)
@@ -63,7 +64,17 @@ class CombatController(HelpfulController):
         self.parent.update()
 
     def add_players(self, command_line, widget_proxy, live):
-        pass
+        match = self.players_re.search(command_line)
+        if match:
+            s = match.group('player_string')
+            pairs = s.split(',')
+            for pair in pairs:
+                name, initiative = pair.split('-')
+                player = Member.player(name, initiative)
+                self.parent.encounter.add_member(player)
+        self.parent.wMain.values = []
+        self.parent.wMain.display()
+        self.parent.update()
 
     def change_attribute(self, command_line, widget_proxy, live):
         pass
@@ -93,4 +104,4 @@ class CombatDisplay(_CustomMutt):
 
     def update(self):
         self.wMain.values = self.encounter.alive
-        self.wMain.update()
+        self.wMain.update(clear=True)
