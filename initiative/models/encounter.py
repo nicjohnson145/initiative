@@ -34,6 +34,8 @@ class Encounter(object):
         self.turn_index = 0
 
     def add_member(self, member):
+        if len(self.members) > 0 and member.initiative > self.current_turn_member.initiative:
+            self.__next_index()
         self.members.append(member)
         by_base = self.members_by_base_name[member.base_name]
         by_base.append(member)
@@ -48,7 +50,14 @@ class Encounter(object):
                 member.name = member.base_name + '_' + str(index + 1)
 
     def remove_member(self, member):
+        has_higher_initiative = member.initiative > self.current_turn_member.initiative
+        if has_higher_initiative:
+            self.__previous_index()
+
         self._remove_member_from_list(self.members, member)
+        if not has_higher_initiative and member == self.current_turn_member:
+            self.__next_index()
+
         by_base = self.members_by_base_name[member.base_name]
         self._remove_member_from_list(by_base, member)
         if len(by_base) == 0:
@@ -56,6 +65,7 @@ class Encounter(object):
         else:
             self.calculate_instance(by_base)
         self.maintain_order()
+        self.indicate_turn()
 
     def _remove_member_from_list(self, member_list, member):
         index = None
@@ -108,8 +118,13 @@ class Encounter(object):
 
     def __next_index(self):
         self.turn_index += 1
-        if self.turn_index == len(self.members):
+        if self.turn_index >= len(self.members):
             self.turn_index = 0
+
+    def __previous_index(self):
+        self.turn_index -= 1
+        if self.turn_index == -1:
+            self.turn_index = len(self.members) - 1
 
     def as_dict(self):
         return {

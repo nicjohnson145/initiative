@@ -1,7 +1,9 @@
+import functools
 import random
 import string
 
 import npyscreen
+from nose import SkipTest
 
 from initiative.constants import ENCOUNTER_ADDITION, FILTERED_SELECT
 
@@ -32,3 +34,15 @@ def add_to_encounter(parentApp, encounter):
     form.set_type(ENCOUNTER_ADDITION)
     form.encounter = encounter
     parentApp.switchForm(FILTERED_SELECT)
+
+
+def expected_failure(test):
+    @functools.wraps(test)
+    def inner(*args, **kwargs):
+        try:
+            test(*args, **kwargs)
+        except Exception:
+            raise SkipTest
+        else:
+            raise AssertionError('Failure expected')
+    return inner
