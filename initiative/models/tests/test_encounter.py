@@ -106,7 +106,6 @@ class TestEncounter(object):
         encounter.remove_member(members[2])
         compare(actual=encounter.current_turn_member.name, expected=members[1].name)
 
-    @attr('current')
     def test_remove_member_current_turn_in_middle_advances_turn(self):
         encounter, members = self.setup_turn_test()
         encounter.remove_member(members[1])

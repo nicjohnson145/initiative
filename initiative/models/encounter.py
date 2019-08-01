@@ -51,11 +51,14 @@ class Encounter(object):
 
     def remove_member(self, member):
         has_higher_initiative = member.initiative > self.current_turn_member.initiative
+        is_current = member == self.current_turn_member
+        is_last = self.turn_index == len(self.members) - 1
+
         if has_higher_initiative:
             self.__previous_index()
 
         self._remove_member_from_list(self.members, member)
-        if not has_higher_initiative and member == self.current_turn_member:
+        if not has_higher_initiative and (is_current and is_last):
             self.__next_index()
 
         by_base = self.members_by_base_name[member.base_name]
