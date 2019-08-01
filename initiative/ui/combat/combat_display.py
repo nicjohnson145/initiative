@@ -28,8 +28,8 @@ class CombatController(HelpfulController):
     def create(self):
         self.add_action(':d(amage)', self.damage_member, False)
         self.add_action(':h(eal)', self.heal_member, False)
-        self.add_action(':activate$', self.activate_member, False)
-        self.add_action(':deactivate$', self.deactivate_member, False)
+        self.add_action(':res(surect)?$', self.resurrect_member, False)
+        self.add_action(':k(ill)?$', self.kill_member, False)
         self.add_action(':add$', self.add_member, False)
         self.add_action(':remove$', self.remove_member, False)
         self.add_action(':p(layers)?', self.add_players, False)
@@ -50,11 +50,12 @@ class CombatController(HelpfulController):
             func(int(match.group('amt')))
             self.parent.update()
 
-    def activate_member(self, command_line, widget_proxy, live):
+    def resurrect_member(self, command_line, widget_proxy, live):
         pass
 
-    def deactivate_member(self, command_line, widget_proxy, live):
-        pass
+    def kill_member(self, command_line, widget_proxy, live):
+        self.parent.selected.is_alive = False
+        self.parent.update()
 
     def add_member(self, command_line, widget_proxy, live):
         add_to_encounter(self.parent.parentApp, self.parent.encounter)
@@ -72,9 +73,7 @@ class CombatController(HelpfulController):
                 name, initiative = pair.split('-')
                 player = Member.player(name, initiative)
                 self.parent.encounter.add_member(player)
-        self.parent.wMain.values = []
-        self.parent.wMain.display()
-        self.parent.update()
+        self.parent.harsh_update()
 
     def change_attribute(self, command_line, widget_proxy, live):
         pass
@@ -100,6 +99,11 @@ class CombatDisplay(_CustomMutt):
 
     def beforeEditing(self):
         self.encounter.indicate_turn()
+        self.update()
+
+    def harsh_update(self):
+        self.wMain.values = []
+        self.wMain.display()
         self.update()
 
     def update(self):

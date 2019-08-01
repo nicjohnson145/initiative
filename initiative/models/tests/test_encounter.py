@@ -1,9 +1,7 @@
-from nose.plugins.attrib import attr
 from nose.tools import nottest
 from testfixtures import compare
 
 from initiative.models.encounter import Encounter, Member
-from initiative.util import expected_failure
 
 
 class TestEncounter(object):
