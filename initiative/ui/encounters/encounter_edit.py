@@ -1,5 +1,4 @@
 import curses
-import json
 import logging
 import os
 import re
@@ -104,7 +103,7 @@ class EncounterEditController(HelpfulController):
                     self.parent.encounter.add_member(new)
                 self.parent.show_members()
             else:
-                self.show_invalid(msg='Invalid Args')
+                self.show_temp_message(msg='Invalid Args')
 
     def name_encounter(self, command_line, widget_proxy, live):
         name = command_line.replace(':name', '').strip()

@@ -84,7 +84,7 @@ class CombatController(HelpfulController):
                 self.parent.selected.use_spell(int(match.group('amt')))
                 self.parent.update()
             else:
-                self.show_invalid(msg='Invalid Args')
+                self.show_temp_message(msg='Invalid Args')
 
     def search_spells(self, command_line, widget_proxy, live):
         self.parent.parentApp.getForm(FILTERED_SELECT).set_type(SPELL)
