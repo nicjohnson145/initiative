@@ -249,6 +249,7 @@ class Member(object):
         else:
             return '|'.join([
                 f'{active}',
+                "{:<2}".format(self.initiative),
                 ('{:<%s}' % PIECE_NAME_LEN).format(self.piece_name),
                 ('{:<%s}' % NAME_LEN).format(self.name),
                 '{:<3} / {:<3}'.format(self.current_hp, self.hit_points),

@@ -2,7 +2,7 @@ import re
 
 import npyscreen
 
-from initiative.constants import ENCOUNTER_LIST, STAT_DISPLAY
+from initiative.constants import ENCOUNTER_LIST, FILTERED_SELECT, SPELL, STAT_DISPLAY
 from initiative.models.encounter import Member
 from initiative.ui.custom_mutt import _CustomMutt
 from initiative.ui.helpful_controller import HelpfulController
@@ -33,6 +33,8 @@ class CombatController(HelpfulController):
         self.add_action(':add$', self.add_member, False)
         self.add_action(':remove$', self.remove_member, False)
         self.add_action(':p(layers)?', self.add_players, False)
+        self.add_action(':use_spell', self.use_spell, False)
+        self.add_action(':spells$', self.search_spells, False)
         self.add_action(':c(hange)?', self.change_attribute, False)
         self.add_action(':t(urn)?$', self.turn, False)
         self.add_action(':q(uit)?!?$', self.quit, False)
@@ -74,6 +76,19 @@ class CombatController(HelpfulController):
                 player = Member.player(name, initiative)
                 self.parent.encounter.add_member(player)
         self.parent.harsh_update()
+
+    def use_spell(self, command_line, widget_proxy, live):
+        if not self.parent.selected.is_player:
+            match = self.digit_re.search(command_line)
+            if match:
+                self.parent.selected.use_spell(int(match.group('amt')))
+                self.parent.update()
+            else:
+                self.show_invalid(msg='Invalid Args')
+
+    def search_spells(self, command_line, widget_proxy, live):
+        self.parent.parentApp.getForm(FILTERED_SELECT).set_type(SPELL)
+        self.parent.parentApp.switchForm(FILTERED_SELECT)
 
     def change_attribute(self, command_line, widget_proxy, live):
         pass

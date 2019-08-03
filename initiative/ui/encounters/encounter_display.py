@@ -4,7 +4,7 @@ import logging
 
 import npyscreen
 
-from initiative.constants import COMBAT_DISPLAY, ENCOUNTER_EDIT, ENCOUNTER_EXT
+from initiative.constants import COMBAT_DISPLAY, ENCOUNTER_EDIT, ENCOUNTER_EXT, MAIN
 from initiative.models.encounter import Encounter
 from initiative.ui.custom_mutt import _CustomMutt
 from initiative.ui.helpful_controller import HelpfulController
@@ -69,7 +69,7 @@ class EncounterListController(HelpfulController):
         return Encounter.load(file.full_path)
 
     def quit(self, command_line, widget_proxy, live):
-        self.parent.parentApp.switchFormPrevious()
+        self.parent.parentApp.switchForm(MAIN)
 
     def start_encounter(self, command_line, widget_proxy, live):
         if self.parent.selected != NO_ENCOUNTER:

@@ -102,7 +102,9 @@ class EncounterEditController(HelpfulController):
                 for _ in range(copies):
                     new = Member.npc(old.base_name, old.stat_block)
                     self.parent.encounter.add_member(new)
-            self.parent.show_members()
+                self.parent.show_members()
+            else:
+                self.show_invalid(msg='Invalid Args')
 
     def name_encounter(self, command_line, widget_proxy, live):
         name = command_line.replace(':name', '').strip()
