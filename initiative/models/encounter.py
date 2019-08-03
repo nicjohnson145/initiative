@@ -132,27 +132,47 @@ class Encounter(object):
     def as_dict(self):
         return {
             'name': self.name,
-            'members_by_base_name': self.__members_by_base_name_to_dict(),
             'members': [m.as_dict() for m in self.members],
             'active': self._active,
             'location': self.location,
             'turn_index': self.turn_index,
+            'stat_blocks': self.__get_stat_block_dict(),
         }
 
-    def __members_by_base_name_to_dict(self):
-        return {name: [m.as_dict() for m in l] for name, l in self.members_by_base_name.items()}
+    def __get_stat_block_dict(self):
+        stat_blocks = {}
+        for member in self.members:
+            block = member.stat_block
+            if block.name not in stat_blocks:
+                stat_blocks[block.name] = block.as_dict()
+
+        return stat_blocks
 
     def _from_dict(self, value):
+        members = self.__build_members(value)
+        members_by_base = self.__build_members_by_base(members)
         self.name = value['name']
-        self.members_by_base_name = self.__members_by_base_name_from_dict(value['members_by_base_name'])  # noqa
-        self.members = [Member.from_dict(d) for d in value['members']]
+        self.members_by_base_name = members_by_base
+        self.members = members
         self._active = value['active']
         self.location = value['location']
         self.turn_index = value['turn_index']
 
-    def __members_by_base_name_from_dict(self, value):
-        d = {name: [Member.from_dict(d) for d in l] for name, l in value.items()}
-        return defaultdict(list, d)
+    def __build_members(self, value):
+        members = []
+        stat_blocks = value['stat_blocks']
+        for member_dict in value['members']:
+            member_dict['stat_block'] = stat_blocks[member_dict['block_name']]
+            members.append(Member.from_dict(member_dict))
+
+        return members
+
+    def __build_members_by_base(self, member_list):
+        members_by_base = defaultdict(list)
+        for m in member_list:
+            members_by_base[m.base_name].append(m)
+
+        return members_by_base
 
     def save(self):
         with open(self.path, 'w') as fl:
@@ -161,8 +181,7 @@ class Encounter(object):
     @classmethod
     def load(self, filepath):
         with open(filepath, 'r') as fl:
-            e = Encounter.from_dict(json.load(fl))
-            return e
+            return Encounter.from_dict(json.load(fl))
 
 
 class Member(object):
@@ -247,7 +266,6 @@ class Member(object):
             'base_name': self.base_name,
             'name': self.name,
             'piece_name': self.piece_name,
-            'stat_block': self.stat_block.as_dict(),
             'is_player': self.is_player,
             'used_slots': dict(self.used_slots),
             'current_hp': self.current_hp,
@@ -255,6 +273,7 @@ class Member(object):
             'initiative': self.initiative,
             'is_alive': self.is_alive,
             'current_turn': self.current_turn,
+            'block_name': self.stat_block.name
         }
 
     def _from_dict(self, value):
