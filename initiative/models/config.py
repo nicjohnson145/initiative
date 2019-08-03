@@ -2,11 +2,12 @@ import os
 from pathlib import Path
 import json
 
-DEFAULT_ENCOUNTER_STORAGE = '/var/lib/initiative/encounters'
+DEFAULT_ENCOUNTER_STORAGE = os.path.expanduser('~/.config/initiative/encounters')
 
 EXTRA_NPCS_PATH = 'extra_npcs_path'
 EXTRA_SPELLS_PATH = 'extra_spells_path'
 ENCOUNTER_PATH = 'encounter_path'
+AUTOSAVE_ENCOUNTERS = 'autosave_encounters'
 
 
 class Config(object):
@@ -21,6 +22,7 @@ class Config(object):
                     self.config = {}
         else:
             self.config = {}
+        os.makedirs(self.encounter_path, exist_ok=True)
 
     @property
     def encounter_path(self):
@@ -33,3 +35,7 @@ class Config(object):
     @property
     def extra_spells_path(self):
         return self.config.get(EXTRA_SPELLS_PATH)
+
+    @property
+    def autosave_encounters(self):
+        return self.config.get(AUTOSAVE_ENCOUNTERS, True)

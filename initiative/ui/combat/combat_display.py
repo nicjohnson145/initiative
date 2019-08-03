@@ -37,7 +37,11 @@ class CombatController(HelpfulController):
         self.add_action(':spells$', self.search_spells, False)
         self.add_action(':c(hange)?', self.change_attribute, False)
         self.add_action(':t(urn)?$', self.turn, False)
+        self.add_action(':autosave$', self.toggle_autosave, False)
         self.add_action(':q(uit)?!?$', self.quit, False)
+
+    def action_performed(self):
+        pass
 
     def damage_member(self, command_line, widget_proxy, live):
         self._health_interation('damage', command_line)
@@ -96,6 +100,9 @@ class CombatController(HelpfulController):
     def turn(self, command_line, widget_proxy, live):
         self.parent.encounter.advance_turn()
         self.parent.update()
+
+    def toggle_autosave(self, command_line, widget_proxy, live):
+        pass
 
     def quit(self, command_line, widget_proxy, live):
         if '!' not in command_line:
