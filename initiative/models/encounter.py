@@ -243,7 +243,7 @@ class Member(object):
         return self.name
 
     def combat_display(self):
-        active = '+' if self.current_turn else '-'
+        active = '*' if self.current_turn else ' '
         if self.is_player:
             return f"{active}|{self.name}"
         else:
