@@ -9,8 +9,8 @@ from initiative.util import make_string_file_safe, roll_d20
 
 log = logging.getLogger(__name__)
 
-PIECE_NAME_LEN = 18
-NAME_LEN = 15
+PIECE_NAME_LEN = 20
+NAME_LEN = 22
 
 
 class Encounter(object):
