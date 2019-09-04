@@ -1,4 +1,6 @@
 import npyscreen
+from textwrap import wrap
+from prettytable import PrettyTable, ALL
 
 
 class HelpfulController(npyscreen.ActionControllerSimple):
@@ -7,6 +9,7 @@ class HelpfulController(npyscreen.ActionControllerSimple):
         super().__init__(*args, **kwargs)
         self.add_action(':h(elp)?', self.display_help, False)
         self.add_action(':.*', self.invalid_command, False)
+        self.help_width = 60
 
     def display_help(self, command_line, widget_proxy, live):
         self.parent.set_status2_preserve_line(self.parent.COMMAND_TITLE)
@@ -19,6 +22,18 @@ class HelpfulController(npyscreen.ActionControllerSimple):
             if ident != "re.compile(':.*')":
                 ret.append(ident)
         return ret
+
+    def help_table(self, *rows):
+        t = PrettyTable()
+        t.hrules = ALL
+        t.align = 'l'
+        t.field_names = ['Command', 'Description']
+        for row in rows:
+            t.add_row([
+                row[0],
+                '\n'.join(wrap(row[1], width=self.help_width))
+            ])
+        return t.get_string()
 
     def invalid_command(self, command_line, widget_proxy, live):
         self.show_temp_message()

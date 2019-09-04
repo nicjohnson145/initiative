@@ -1,6 +1,10 @@
+import logging
 import os
 import re
+
 from cached_property import cached_property
+
+log = logging.getLogger(__name__)
 
 
 class File(object):

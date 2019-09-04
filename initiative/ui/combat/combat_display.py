@@ -1,4 +1,6 @@
 import re
+from textwrap import dedent
+from prettytable import PrettyTable, ALL
 
 import npyscreen
 
@@ -40,14 +42,34 @@ class CombatController(HelpfulController):
         self.add_action(':autosave$', self.toggle_autosave, False)
         self.add_action(':q(uit)?!?$', self.quit, False)
 
+    def help_message(self):
+        return self.help_table(
+            ['d(amage) <int>', 'Damage the selected member'],
+            ['h(eal) <int>', 'Heal the selected member'],
+            ['res(surect)', 'TBD'],
+            ['k(ill)', 'Kill the selected member and remove them from the encounter'],
+            ['add', 'Add a member to the encounter'],
+            ['remove', 'Remove selected member from encounter'],
+            ['p(layers) <name>-<initiative>,....', 'Add players to encounter'],
+            ['use_spell <int>', 'Indicate a used spell slot on the selected member'],
+            ['spells', 'Search spells'],
+            ['c(hange)', 'TBD'],
+            ['t(urn)', 'Incrememt the trun indicator'],
+            ['q(uit)', 'Save and quit'],
+            ['q(uit)!', 'Quit without saving'],
+        )
+
     def action_performed(self):
-        pass
+        if self.parent.parentApp.config.autosave_encounters:
+            self.parent.encounter.save()
 
     def damage_member(self, command_line, widget_proxy, live):
         self._health_interation('damage', command_line)
+        self.action_performed()
 
     def heal_member(self, command_line, widget_proxy, live):
         self._health_interation('heal', command_line)
+        self.action_performed()
 
     def _health_interation(self, attr, cmd_line):
         match = self.digit_re.search(cmd_line)
@@ -62,13 +84,16 @@ class CombatController(HelpfulController):
     def kill_member(self, command_line, widget_proxy, live):
         self.parent.selected.is_alive = False
         self.parent.update()
+        self.action_performed()
 
     def add_member(self, command_line, widget_proxy, live):
         add_to_encounter(self.parent.parentApp, self.parent.encounter)
+        self.action_performed()
 
     def remove_member(self, command_line, widget_proxy, live):
         self.parent.encounter.remove_member(self.parent.selected)
         self.parent.update()
+        self.action_performed()
 
     def add_players(self, command_line, widget_proxy, live):
         match = self.players_re.search(command_line)
@@ -80,6 +105,7 @@ class CombatController(HelpfulController):
                 player = Member.player(name, initiative)
                 self.parent.encounter.add_member(player)
         self.parent.harsh_update()
+        self.action_performed()
 
     def use_spell(self, command_line, widget_proxy, live):
         if not self.parent.selected.is_player:
@@ -89,6 +115,7 @@ class CombatController(HelpfulController):
                 self.parent.update()
             else:
                 self.show_temp_message(msg='Invalid Args')
+        self.action_performed()
 
     def search_spells(self, command_line, widget_proxy, live):
         self.parent.parentApp.getForm(FILTERED_SELECT).set_type(SPELL)
@@ -100,6 +127,7 @@ class CombatController(HelpfulController):
     def turn(self, command_line, widget_proxy, live):
         self.parent.encounter.advance_turn()
         self.parent.update()
+        self.action_performed()
 
     def toggle_autosave(self, command_line, widget_proxy, live):
         pass

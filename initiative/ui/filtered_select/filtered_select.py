@@ -114,10 +114,11 @@ class FileListDisplay(_CustomMutt):
             ],
             SPELL: [
                 os.path.join(self.parentApp.root_dir, 'spells'),
+                self.parentApp.config.extra_spells_path,
             ],
             ENCOUNTER_ADDITION: [
                 os.path.join(self.parentApp.root_dir, 'monsters'),
                 self.parentApp.config.extra_npcs_path,
             ],
         }
-        return directories[self.type_]
+        return list(filter(lambda x: x is not None, directories[self.type_]))
