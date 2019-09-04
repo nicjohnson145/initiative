@@ -1,6 +1,4 @@
 import re
-from textwrap import dedent
-from prettytable import PrettyTable, ALL
 
 import npyscreen
 
