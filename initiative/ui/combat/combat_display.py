@@ -24,6 +24,7 @@ class CombatController(HelpfulController):
 
     digit_re = re.compile(r':.* +(?P<amt>\d+)')
     players_re = re.compile(r':p(layers)? +(?P<player_string>.*)')
+    piece_re = re.compile(r':p(iece)? (?P<piece_name>.*)')
 
     def create(self):
         self.add_action(':d(amage)', self.damage_member, False)
@@ -32,7 +33,8 @@ class CombatController(HelpfulController):
         self.add_action(':k(ill)?$', self.kill_member, False)
         self.add_action(':add$', self.add_member, False)
         self.add_action(':remove$', self.remove_member, False)
-        self.add_action(':p(layers)?', self.add_players, False)
+        self.add_action(':players?', self.add_players, False)
+        self.add_action(':p(iece)?', self.set_piece_name, False)
         self.add_action(':use_spell', self.use_spell, False)
         self.add_action(':spells$', self.search_spells, False)
         self.add_action(':c(hange)?', self.change_attribute, False)
@@ -48,7 +50,7 @@ class CombatController(HelpfulController):
             ['k(ill)', 'Kill the selected member and remove them from the encounter'],
             ['add', 'Add a member to the encounter'],
             ['remove', 'Remove selected member from encounter'],
-            ['p(layers) <name>-<initiative>,....', 'Add players to encounter'],
+            ['players <name>-<initiative>,....', 'Add players to encounter'],
             ['use_spell <int>', 'Indicate a used spell slot on the selected member'],
             ['spells', 'Search spells'],
             ['c(hange)', 'TBD'],
@@ -104,6 +106,13 @@ class CombatController(HelpfulController):
                 self.parent.encounter.add_member(player)
         self.parent.harsh_update()
         self.action_performed()
+
+    def set_piece_name(self, command_line, widget_proxy, live):
+        match = self.piece_re.search(command_line)
+        if match:
+            self.parent.selected.set_piece_name(match.group('piece_name'))
+            self.parent.update()
+            self.action_performed()
 
     def use_spell(self, command_line, widget_proxy, live):
         if not self.parent.selected.is_player:
