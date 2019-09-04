@@ -25,6 +25,8 @@ class CombatController(HelpfulController):
     digit_re = re.compile(r':.* +(?P<amt>\d+)')
     players_re = re.compile(r':p(layers)? +(?P<player_string>.*)')
     piece_re = re.compile(r':p(iece)? (?P<piece_name>.*)')
+    change_re = re.compile(r':c(hange)? (?P<attribute>\b.*\b) (?P<new_value>\b.*\b)')
+    changeable_attrs = set(['initiative'])
 
     def create(self):
         self.add_action(':d(amage)', self.damage_member, False)
@@ -53,7 +55,11 @@ class CombatController(HelpfulController):
             ['players <name>-<initiative>,....', 'Add players to encounter'],
             ['use_spell <int>', 'Indicate a used spell slot on the selected member'],
             ['spells', 'Search spells'],
-            ['c(hange)', 'TBD'],
+            [
+                'c(hange) <attr> <value>',
+                ("Change an attribute about the selected memeber. Currently supported attributes "
+                 "are " + ','.join(self.changeable_attrs))
+            ],
             ['t(urn)', 'Incrememt the trun indicator'],
             ['q(uit)', 'Save and quit'],
             ['q(uit)!', 'Quit without saving'],
@@ -129,7 +135,21 @@ class CombatController(HelpfulController):
         self.parent.parentApp.switchForm(FILTERED_SELECT)
 
     def change_attribute(self, command_line, widget_proxy, live):
-        pass
+        match = self.change_re.search(command_line)
+        if match:
+            attr = match.group('attribute')
+            new_value = match.group('new_value')
+
+            if attr not in self.changeable_attrs:
+                self.show_temp_message(msg=f"Cannot change attribute {attr}")
+
+            if attr == 'initiative':
+                try:
+                    self.parent.selected.set_initiative(int(new_value))
+                    self.parent.update()
+                    self.action_performed()
+                except ValueError as ex:
+                    self.show_temp_message(msg=str(ex))
 
     def turn(self, command_line, widget_proxy, live):
         self.parent.encounter.advance_turn()
