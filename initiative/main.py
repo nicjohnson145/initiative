@@ -15,8 +15,11 @@ from initiative.ui.encounters.encounter_edit import EncounterEdit
 from initiative.ui.filtered_select.filtered_select import FileListDisplay
 from initiative.ui.spell_display.spell_display import SpellDisplay
 from initiative.ui.stat_display.stat_display_form import StatDisplay
+from pathlib import Path
 
-logging.basicConfig(filename='/home/njohnson/app.log', filemode='w', level=logging.DEBUG,
+
+_log_path = os.path.join(Path.home(), 'app.log')
+logging.basicConfig(filename=_log_path, filemode='w', level=logging.DEBUG,
                     format='%(name)s - %(levelname)s - %(message)s')
 
 log = logging.getLogger(__name__)
