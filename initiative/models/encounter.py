@@ -142,6 +142,9 @@ class Encounter(object):
     def __get_stat_block_dict(self):
         stat_blocks = {}
         for member in self.members:
+            if member.is_player:
+                continue
+
             block = member.stat_block
             if block.name not in stat_blocks:
                 stat_blocks[block.name] = block.as_dict()
@@ -162,7 +165,8 @@ class Encounter(object):
         members = []
         stat_blocks = value['stat_blocks']
         for member_dict in value['members']:
-            member_dict['stat_block'] = stat_blocks[member_dict['block_name']]
+            is_player = member_dict['is_player']
+            member_dict['stat_block'] = None if is_player else stat_blocks[member_dict['block_name']]
             members.append(Member.from_dict(member_dict))
 
         return members
@@ -274,15 +278,15 @@ class Member(object):
             'initiative': self.initiative,
             'is_alive': self.is_alive,
             'current_turn': self.current_turn,
-            'block_name': self.stat_block.name
+            'block_name': None if self.is_player else self.stat_block.name
         }
 
     def _from_dict(self, value):
         self.base_name = value['base_name']
         self.name = value['name']
         self.piece_name = value['piece_name']
-        self.stat_block = StatBlock(value['stat_block'])
         self.is_player = value['is_player']
+        self.stat_block = None if self.is_player else StatBlock(value['stat_block'])
         self.used_slots = defaultdict(int, value['used_slots'])
         self.current_hp = value['current_hp']
         self.hit_points = value['hit_points']

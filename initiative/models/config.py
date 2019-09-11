@@ -49,4 +49,4 @@ class Config(object):
 
     @property
     def autosave_encounters(self):
-        return self.config.get(AUTOSAVE_ENCOUNTERS, True)
+        return self.config.get(AUTOSAVE_ENCOUNTERS, False)
