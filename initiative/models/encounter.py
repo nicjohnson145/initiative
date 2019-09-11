@@ -179,8 +179,10 @@ class Encounter(object):
         return members_by_base
 
     def save(self):
+        # Try getting the JSON string first to avoid writing a zeroed out file if there's an error
+        json_str = json.dumps(self.as_dict(), indent=4)
         with open(self.path, 'w') as fl:
-            json.dump(self.as_dict(), fl, indent=4)
+            fl.write(json_str)
 
     @classmethod
     def load(self, filepath):
