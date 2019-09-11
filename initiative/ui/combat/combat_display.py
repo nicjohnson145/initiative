@@ -175,6 +175,8 @@ class CombatDisplay(_CustomMutt):
         self.encounter = None
 
     def beforeEditing(self):
+        self.wStatus1.value = '' if self.encounter is None else self.encounter.name
+        self.wStatus2.value = "Command"
         self.encounter.indicate_turn()
         self.update()
 
