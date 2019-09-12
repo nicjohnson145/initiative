@@ -20,9 +20,9 @@ class Encounter(object):
         return cls(None)
 
     @classmethod
-    def from_dict(cls, value):
+    def from_dict(cls, value, encounterRoot):
         e = Encounter.empty()
-        e._from_dict(value)  # pylint: disable=W0212
+        e._from_dict(value, encounterRoot)  # pylint: disable=W0212
         return e
 
     def __init__(self, name, location=None, active=False):
@@ -129,12 +129,12 @@ class Encounter(object):
         if self.turn_index == -1:
             self.turn_index = len(self.members) - 1
 
-    def as_dict(self):
+    def as_dict(self, encounterRoot):
         return {
             'name': self.name,
             'members': [m.as_dict() for m in self.members],
             'active': self._active,
-            'location': self.location,
+            'location': os.path.relpath(self.location, encounterRoot),
             'turn_index': self.turn_index,
             'stat_blocks': self.__get_stat_block_dict(),
         }
@@ -151,14 +151,14 @@ class Encounter(object):
 
         return stat_blocks
 
-    def _from_dict(self, value):
+    def _from_dict(self, value, encounterRoot):
         members = self.__build_members(value)
         members_by_base = self.__build_members_by_base(members)
         self.name = value['name']
         self.members_by_base_name = members_by_base
         self.members = members
         self._active = value['active']
-        self.location = value['location']
+        self.location = os.path.join(encounterRoot, value['location'])
         self.turn_index = value['turn_index']
 
     def __build_members(self, value):
@@ -178,16 +178,16 @@ class Encounter(object):
 
         return members_by_base
 
-    def save(self):
+    def save(self, encounterRoot):
         # Try getting the JSON string first to avoid writing a zeroed out file if there's an error
-        json_str = json.dumps(self.as_dict(), indent=4)
+        json_str = json.dumps(self.as_dict(encounterRoot), indent=4)
         with open(self.path, 'w') as fl:
             fl.write(json_str)
 
     @classmethod
-    def load(self, filepath):
+    def load(self, filepath, encounterRoot):
         with open(filepath, 'r') as fl:
-            return Encounter.from_dict(json.load(fl))
+            return Encounter.from_dict(json.load(fl), encounterRoot)
 
 
 class Member(object):

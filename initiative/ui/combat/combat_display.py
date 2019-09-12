@@ -67,7 +67,7 @@ class CombatController(HelpfulController):
 
     def action_performed(self):
         if self.parent.parentApp.config.autosave_encounters:
-            self.parent.encounter.save()
+            self.parent.encounter.save(self.parent.parentApp.config.encounter_path)
 
     def damage_member(self, command_line, widget_proxy, live):
         self._health_interation('damage', command_line)
@@ -161,7 +161,7 @@ class CombatController(HelpfulController):
 
     def quit(self, command_line, widget_proxy, live):
         if '!' not in command_line:
-            self.parent.encounter.save()
+            self.parent.encounter.save(self.parent.parentApp.config.encounter_path)
         self.parent.parentApp.switchForm(ENCOUNTER_LIST)
 
 

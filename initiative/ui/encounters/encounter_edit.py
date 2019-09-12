@@ -144,7 +144,7 @@ class EncounterEditController(HelpfulController):
             return self.parent.encounter.location
 
     def save_file_location(self):
-        self.parent.encounter.save()
+        self.parent.encounter.save(self.parent.parentApp.config.encounter_path)
         self.parent.pending_edits = False
 
     def quit(self, command_line, widget_proxy, live):

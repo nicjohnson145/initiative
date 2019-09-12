@@ -65,7 +65,7 @@ class EncounterListController(HelpfulController):
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
 
     def load_encounter(self, file):
-        return Encounter.load(file.full_path)
+        return Encounter.load(file.full_path, self.parent.parentApp.config.encounter_path)
 
     def quit(self, command_line, widget_proxy, live):
         self.parent.parentApp.switchForm(MAIN)
