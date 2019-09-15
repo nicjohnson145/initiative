@@ -250,17 +250,18 @@ class Member(object):
 
     def combat_display(self):
         active = '*' if self.current_turn else ' '
-        if self.is_player:
-            return f"{active}|{self.name}"
-        else:
-            return '|'.join([
-                f'{active}',
-                "{:<2}".format(self.initiative),
-                ('{:<%s}' % PIECE_NAME_LEN).format(self.piece_name),
-                ('{:<%s}' % NAME_LEN).format(self.name),
+        columns = [
+            f'{active}',
+            "{:<2}".format(self.initiative),
+            ('{:<%s}' % PIECE_NAME_LEN).format(self.piece_name),
+            ('{:<%s}' % NAME_LEN).format(self.name),
+        ]
+        if not self.is_player:
+            columns.extend([
                 '{:<3} / {:<3}'.format(self.current_hp, self.hit_points),
                 f'{self.spell_slot_str}',
             ])
+        return '|'.join(columns)
 
     def __eq__(self, other):
         return self.name == other.name
