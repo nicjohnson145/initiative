@@ -26,7 +26,7 @@ class CombatController(HelpfulController):
     players_re = re.compile(r':p(layers)? +(?P<player_string>.*)')
     piece_re = re.compile(r':p(iece)? (?P<piece_name>.*)')
     change_re = re.compile(r':c(hange)? (?P<attribute>\b.*\b) (?P<new_value>\b.*\b)')
-    changeable_attrs = set(['initiative'])
+    changeable_attrs = set(['initiative', 'turn'])
 
     def create(self):
         self.add_action(':d(amage)', self.damage_member, False)
@@ -150,6 +150,12 @@ class CombatController(HelpfulController):
                     self.action_performed()
                 except ValueError as ex:
                     self.show_temp_message(msg=str(ex))
+            elif attr == 'turn':
+                self.parent.encounter.set_turn(self.parent.selected.name)
+                self.parent.update()
+                self.action_performed()
+        else:
+            self.show_temp_message()
 
     def turn(self, command_line, widget_proxy, live):
         self.parent.encounter.advance_turn()

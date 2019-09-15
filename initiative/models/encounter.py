@@ -129,6 +129,12 @@ class Encounter(object):
         if self.turn_index == -1:
             self.turn_index = len(self.members) - 1
 
+    def set_turn(self, name):
+        self.current_turn_member.current_turn = False
+        while not self.current_turn_member.name == name:
+            self.__next_index()
+        self.indicate_turn()
+
     def as_dict(self, encounterRoot):
         return {
             'name': self.name,
