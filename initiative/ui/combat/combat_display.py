@@ -53,6 +53,7 @@ class CombatController(HelpfulController):
             ['add', 'Add a member to the encounter'],
             ['remove', 'Remove selected member from encounter'],
             ['players <name>-<initiative>,....', 'Add players to encounter'],
+            ['p(iece)', 'Set the piece name of a member'],
             ['use_spell <int>', 'Indicate a used spell slot on the selected member'],
             ['spells', 'Search spells'],
             [
