@@ -175,6 +175,7 @@ class Encounter(object):
             member_dict['stat_block'] = None if is_player else stat_blocks[member_dict['block_name']]
             members.append(Member.from_dict(member_dict))
 
+        members.sort(key=lambda m: m.initiative, reverse=True)
         return members
 
     def __build_members_by_base(self, member_list):
