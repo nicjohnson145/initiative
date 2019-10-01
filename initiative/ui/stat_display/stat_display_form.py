@@ -5,7 +5,7 @@ import npyscreen
 from initiative.ui.stat_display.grid_box import GridBox
 
 BUTTON_COLUMNS = 4
-BOX_HEIGHT = 5
+BOX_HEIGHT = 6
 ENTRY_HEIGHT = BOX_HEIGHT - 2
 
 
