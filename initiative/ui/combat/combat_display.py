@@ -41,7 +41,7 @@ class CombatController(HelpfulController):
         self.add_action(':spells$', self.search_spells, False)
         self.add_action(':c(hange)?', self.change_attribute, False)
         self.add_action(':t(urn)?$', self.turn, False)
-        self.add_action(':autosave$', self.toggle_autosave, False)
+        self.add_action(':save$', self.save, False)
         self.add_action(':q(uit)?!?$', self.quit, False)
 
     def help_message(self):
@@ -62,13 +62,14 @@ class CombatController(HelpfulController):
                  "are " + ','.join(self.changeable_attrs))
             ],
             ['t(urn)', 'Incrememt the trun indicator'],
+            ['save', 'Manually save the encounter'],
             ['q(uit)', 'Save and quit'],
             ['q(uit)!', 'Quit without saving'],
         )
 
     def action_performed(self):
         if self.parent.parentApp.config.autosave_encounters:
-            self.parent.encounter.save(self.parent.parentApp.config.encounter_path)
+            self.save(None, None, None)
 
     def damage_member(self, command_line, widget_proxy, live):
         self._health_interation('damage', command_line)
@@ -163,13 +164,13 @@ class CombatController(HelpfulController):
         self.parent.update()
         self.action_performed()
 
-    def toggle_autosave(self, command_line, widget_proxy, live):
-        pass
-
     def quit(self, command_line, widget_proxy, live):
         if '!' not in command_line:
             self.parent.encounter.save(self.parent.parentApp.config.encounter_path)
         self.parent.parentApp.switchForm(ENCOUNTER_LIST)
+
+    def save(self, command_line, widget_proxy, live):
+        self.parent.encounter.save(self.parent.parentApp.config.encounter_path)
 
 
 class CombatDisplay(_CustomMutt):
