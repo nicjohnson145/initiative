@@ -11,6 +11,7 @@ setup(
     install_requires=[
         'npyscreen',
         'cached-property',
+        'prettytable',
     ],
     package_data={
         'initiative': [
