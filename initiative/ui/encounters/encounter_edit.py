@@ -77,6 +77,16 @@ class EncounterEditController(HelpfulController):
         self.add_action(':s(ave)?!?', self.save_encounter, False)
         self.add_action(':q(uit)?', self.quit, False)
 
+    def help_message(self):
+        return self.help_table(
+            [':add', "Add member to encounter"],
+            [':r(emove)', "Remove member from encounter"],
+            [':dup(licate) X', "Duplicate the selected member X times"],
+            [':name', "Name the encounter"],
+            [':s(ave)', "Save the encounter"],
+            [':q(uit)', "Quit building this encounter"],
+        )
+
     def add_member(self, command_line, widget_proxy, live):
         if self.confirmed_valid():
             add_to_encounter(self.parent.parentApp, self.parent.encounter)
@@ -154,16 +164,6 @@ class EncounterEditController(HelpfulController):
             if not exit_anyway:
                 return
         self.parent.parentApp.switchFormPrevious()
-
-    def _help_message(self):
-        return dedent("""
-            Actions:
-                - :add -> Add a Member to the encounter
-                - :remove <member_id> -> Remove a member from the encounter
-                - :name <name>-> Set the name of the encounter
-                - :save -> Save all edits made to this encounter to disk
-                - :q/:quit -> Leave this screen and return to the previous
-        """)
 
 
 class EncounterEdit(_CustomMutt):

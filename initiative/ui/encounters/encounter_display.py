@@ -42,10 +42,18 @@ class EncounterListController(HelpfulController):
     def create(self):
         self.add_action('^/.*', self.search, True)
         self.add_action('^:(add|create|new)', self.create_encounter, False)
-        self.add_action('^:reset', self.reset_encounter, False)
         self.add_action('^:edit', self.edit_encounter, False)
         self.add_action('^:start$', self.start_encounter, False)
         self.add_action('^:q(uit)?', self.quit, False)
+
+    def help_message(self):
+        return self.help_table(
+            ['/<search>', 'Filter by search criteria'],
+            [':(add|create|new)', 'Create a new encounter'],
+            [':edit', 'Edit selected encounter'],
+            [':start', 'Start selected encounter'],
+            [':q(uit)', 'Quit'],
+        )
 
     def search(self, command_line, widget_proxy, live):
         self.parent.searcher.set_regex(command_line[1:])
@@ -55,9 +63,6 @@ class EncounterListController(HelpfulController):
     def create_encounter(self, command_line, widget_proxy, live):
         self.parent.parentApp.getForm(ENCOUNTER_EDIT).encounter = Encounter.empty()
         self.parent.parentApp.switchForm(ENCOUNTER_EDIT)
-
-    def reset_encounter(self, command_line, widget_proxy, live):
-        log.info("reset")
 
     def edit_encounter(self, command_line, widget_proxy, live):
         enc = self.load_encounter(self.parent.selected)
