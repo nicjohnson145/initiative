@@ -8,5 +8,5 @@ Currently very much in beta.
 
 ```
 git clone https://github.com/nicjohnson145/initiative
-pip install -e initiative/
+pip install initiative/
 ```
