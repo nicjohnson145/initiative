@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='initiative',
@@ -6,7 +6,7 @@ setup(
     description='Encounter creator/manager for DnD 5e',
     author='Nic Johnson',
     liscense='MIT',
-    packages=['initiative'],
+    packages=find_packages(),
     zip_safe=False,
     install_requires=[
         'npyscreen',
