@@ -107,7 +107,8 @@ class Encounter(object):
         return self.members[self.turn_index]
 
     def indicate_turn(self):
-        self.current_turn_member.current_turn = True
+        if len(self.members) > 0:
+            self.current_turn_member.current_turn = True
 
     def advance_turn(self):
         if len(self.alive) <= 1:
