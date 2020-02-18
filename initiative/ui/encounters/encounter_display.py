@@ -29,7 +29,6 @@ class EncounterResults(npyscreen.MultiLineAction):
     def actionHighlighted(self, _value, keypress):
         dispatch = {
             E_KEY: self.parent.action_controller.edit_encounter,
-            R_KEY: self.parent.action_controller.reset_encounter,
             curses.ascii.NL: self.parent.action_controller.start_encounter,
             curses.ascii.CR: self.parent.action_controller.start_encounter,
             curses.ascii.SP: self.parent.action_controller.start_encounter,
